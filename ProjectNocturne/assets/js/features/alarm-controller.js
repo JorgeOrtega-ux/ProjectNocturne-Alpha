@@ -1045,7 +1045,7 @@ function updateAlarmSection(sectionId, newName) {
         saveAlarmSectionsToStorage();
         renderAllAlarmCards();
         updateAlarmCounts();
-        showDynamicIslandNotification('success', 'section_updated', 'notifications', { name: newName });
+        showDynamicIslandNotification('success', 'section_updated_success', 'notifications', { name: newName });
     }
 }
 function initializeAlarmClock() {

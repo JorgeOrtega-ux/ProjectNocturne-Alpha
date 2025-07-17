@@ -494,7 +494,16 @@ function updateTimerCardVisuals(timer) {
     const isFinished = !timer.isRunning && timer.remaining <= 0 && !timer.rangAt;
     card.classList.toggle('timer-finished', isFinished);
 }
-
+function updateTimerSection(sectionId, newName) {
+    const section = timerSections.find(s => s.id === sectionId);
+    if (section) {
+        section.name = newName;
+        saveTimerSectionsToStorage();
+        renderAllTimerCards();
+        updateTimerCounts();
+        showDynamicIslandNotification('success', 'section_updated_success', 'notifications', { name: newName });
+    }
+}
 function updateTimerCardControls(timerId) {
     const timer = findTimerById(timerId);
     if (!timer) return;

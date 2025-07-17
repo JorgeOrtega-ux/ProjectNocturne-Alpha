@@ -35,6 +35,7 @@
     "worldclock_deleted_title": "Horloge supprimée",
     "info_title": "Information",
     "error_title": "Erreur",
+    "section_updated_success": "La section '{name}' a été mise à jour avec succès.",
     "premium_title": "Fonctionnalité Premium",
     "limit_reached_title": "Limite maximale atteinte",
     "premium_required_title": "Premium Requis",

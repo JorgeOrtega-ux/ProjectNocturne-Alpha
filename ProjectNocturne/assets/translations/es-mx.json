@@ -54,6 +54,7 @@
     "premium_limit_reached_message": "Conviértete en premium para aumentar el límite disponible",
     "limit_reached_message_premium": "Se ha alcanzado el límite de {type} disponibles.",
     "dismiss": "Descartar",
+    "section_updated_success": "La sección '{name}' se ha actualizado correctamente.",
     "success_title": "Éxito",
     "feedback_success_sent": "¡Comentario enviado con éxito! Gracias por tu feedback.",
     "feedback_error_all_fields": "Por favor, completa todos los campos.",

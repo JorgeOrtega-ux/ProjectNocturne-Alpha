@@ -1153,6 +1153,9 @@ async function handleMenuClick(event, parentMenu) {
             } else if (context === 'timer') {
                 if (window.timerManager && typeof window.timerManager.updateTimerSection === 'function') {
                     window.timerManager.updateTimerSection(sectionId, newSectionName);
+                } else {
+                    // Fallback por si la función no se ha exportado correctamente aún
+                    console.warn('timerManager.updateTimerSection no está disponible.');
                 }
             }
 
