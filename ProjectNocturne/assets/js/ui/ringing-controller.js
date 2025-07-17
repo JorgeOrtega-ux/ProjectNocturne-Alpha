@@ -75,6 +75,11 @@ function getLatestRingingTool() {
 }
 
 function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
+    // Forzar la salida del modo de pantalla completa si está activo.
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    }
+
     const toolId = data.toolId;
     clearAllRingingIntervals();
 
@@ -90,16 +95,14 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
         activateModule('toggleNotificationsOverlay');
     }
 
-    setTimeout(() => {
-        const latestTool = getLatestRingingTool();
-        if (latestTool) {
-            showDetailView(latestTool.toolId);
-        }
-        playSound(data.sound, toolId);
-        updateRestoreButton();
-    }, 50);
+    // El contenido del setTimeout se ha movido aquí directamente
+    const latestTool = getLatestRingingTool();
+    if (latestTool) {
+        showDetailView(latestTool.toolId);
+    }
+    playSound(data.sound, toolId);
+    updateRestoreButton();
 }
-
 function showDetailView(toolId) {
     const menu = document.querySelector('.menu-notifications');
     if (!menu) return;
