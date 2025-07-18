@@ -596,7 +596,10 @@
     gap: 8px;
     padding: 8px;
 }
-
+.search-result-item:has(.card-dropdown-menu:not(.disabled)) {
+    position: relative;
+    z-index: 990;
+}
 .card-menu-container {
     position: absolute;
     top: 5px;

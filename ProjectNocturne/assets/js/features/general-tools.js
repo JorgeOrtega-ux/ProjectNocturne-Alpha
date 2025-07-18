@@ -1350,11 +1350,20 @@ function handleCardMenuToggle(button) {
             menu.popperInstance = null;
         }
         menu.classList.add('disabled');
+        // SOLUCIÓN: Añadir 'disabled' también al contenedor padre
+        const parentContainer = menu.closest('.card-menu-container');
+        if (parentContainer) {
+            parentContainer.classList.add('disabled');
+        }
     });
 
     dropdown.classList.remove('disabled');
 
     const popperReference = button.closest('.card-menu-container');
+    // SOLUCIÓN: Asegurarse de que el contenedor del menú que se abre está visible
+    if (popperReference) {
+        popperReference.classList.remove('disabled');
+    }
 
     const popperInstance = Popper.createPopper(popperReference, dropdown, {
         placement: 'bottom-end',
@@ -1384,10 +1393,16 @@ function initializeCardEventListeners() {
                 if (menu.popperInstance) {
                     menu.popperInstance.destroy();
                     menu.popperInstance = null;
-                    menu.classList.add('disabled');
+                }
+                menu.classList.add('disabled');
+                 // SOLUCIÓN: Añadir 'disabled' también al contenedor padre al hacer clic fuera
+                const parentContainer = menu.closest('.card-menu-container');
+                if (parentContainer) {
+                    parentContainer.classList.add('disabled');
                 }
             });
         }
+
 
         if (!actionTarget) return;
 
