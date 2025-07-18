@@ -93,6 +93,13 @@ function hideSimpleNotification() {
     }
     if (notificationElement) {
         notificationElement.classList.remove('active');
+        // Agregamos un event listener para remover el elemento una vez que la transición de opacidad termina.
+        notificationElement.addEventListener('transitionend', () => {
+            if (notificationElement) {
+                notificationElement.remove();
+                notificationElement = null;
+            }
+        }, { once: true });
     }
 }
 
