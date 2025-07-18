@@ -16,25 +16,23 @@ function updateTitleForSection(sectionName) {
             updateTitle(formatTitle(getTranslation('everything', 'tooltips')));
             break;
         case 'alarm':
-            if (window.alarmManager) {
-                const nextAlarmTime = window.alarmManager.getNextAlarmDetails();
-                const alarmTitle = nextAlarmTime || getTranslation('alarms', 'tooltips');
-                updateTitle(formatTitle(alarmTitle));
-            } else {
-                updateTitle(formatTitle(getTranslation('alarms', 'tooltips')));
-            }
+            updateTitle(formatTitle(getTranslation('alarm', 'tooltips')));
             break;
-        
-        // Se elimina la gestión de 'timer', 'stopwatch' y 'worldClock' de aquí
-        // para que sus controladores tengan control total y se evite el parpadeo.
+
+        // Se establece un título genérico inicial para evitar que persista el de la sección anterior.
+        // Los controladores específicos se encargarán después del título dinámico (ej. el tiempo).
         case 'timer':
+            updateTitle(formatTitle(getTranslation('timer', 'tooltips')));
+            break;
         case 'stopwatch':
+            updateTitle(formatTitle(getTranslation('stopwatch', 'tooltips')));
+            break;
         case 'worldClock':
-            // No hacer nada aquí. El controlador se encargará.
+            updateTitle(formatTitle(getTranslation('world_clock', 'tooltips')));
             break;
 
         default:
-             // Maneja los títulos de las páginas legales
+            // Maneja los títulos de las páginas legales
             let titleKey;
             if (sectionName === 'privacy-policy') titleKey = 'privacy_title';
             else if (sectionName === 'terms-conditions') titleKey = 'terms_title';

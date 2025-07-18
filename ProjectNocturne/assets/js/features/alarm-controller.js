@@ -361,7 +361,7 @@ function updateAlarmCardVisuals(alarm) {
         title.textContent = translatedTitle;
         title.title = translatedTitle;
     }
-    if (time) time.textContent = formatTime(alarm.hour, alarm.minute);
+    if (time) time.innerHTML = formatTime(alarm.hour, alarm.minute);
     if (sound) {
         sound.textContent = getSoundNameById(alarm.sound);
         sound.dataset.soundId = alarm.sound;
@@ -581,7 +581,6 @@ function createSearchResultItem(alarm) {
     item.dataset.id = alarm.id;
     item.dataset.type = 'alarm';
 
-    // Línea añadida para reflejar el estado de la alarma
     item.classList.toggle('alarm-disabled', !alarm.enabled);
 
     const translatedTitle = alarm.type === 'default' ? getTranslation(alarm.title, 'alarms') : alarm.title;
@@ -891,11 +890,41 @@ function formatTime(hour, minute) {
     if (use24HourFormat) {
         return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
     }
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    let h12 = hour % 12;
-    h12 = h12 ? h12 : 12;
-    return `${h12}:${String(minute).padStart(2, '0')} ${ampm}`;
+
+    const tempDate = new Date();
+    tempDate.setHours(hour, minute, 0, 0);
+
+    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+    const parts = new Intl.DateTimeFormat(navigator.language, options).formatToParts(tempDate);
+    
+    let timeString = '';
+    let ampmString = '';
+
+    parts.forEach(part => {
+        if (part.type === 'dayPeriod') {
+            ampmString = part.value;
+        } else {
+            timeString += part.value;
+        }
+    });
+    
+    timeString = timeString.trim();
+
+    return `${timeString}<span class="ampm">${ampmString}</span>`;
 }
+
+function formatTimeForTitle(hour, minute) {
+    if (use24HourFormat) {
+        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    }
+
+    const tempDate = new Date();
+    tempDate.setHours(hour, minute, 0, 0);
+
+    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+    return new Intl.DateTimeFormat(navigator.language, options).format(tempDate);
+}
+
 
 function applyCollapsedSectionsState() {
     document.querySelectorAll('.alarms-container').forEach(container => {
@@ -942,6 +971,16 @@ function updateLocalTime() {
 
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
+        }
+
+        const activeSection = document.querySelector('.section-alarm.active');
+        if (activeSection) {
+            const nextAlarmTime = window.alarmManager.getNextAlarmDetails();
+            const alarmTitle = nextAlarmTime || getTranslation('alarms', 'tooltips');
+            const newTitle = `ProjectNocturne - ${alarmTitle}`;
+            if(document.title !== newTitle) {
+                document.title = newTitle;
+            }
         }
     }
 }
@@ -1209,7 +1248,7 @@ function initializeAlarmClock() {
 
             if (!nextAlarm) return null;
 
-            return formatTime(nextAlarm.hour, nextAlarm.minute);
+            return formatTimeForTitle(nextAlarm.hour, nextAlarm.minute);
         }
     };
 

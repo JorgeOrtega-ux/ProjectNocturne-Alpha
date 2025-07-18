@@ -25,55 +25,6 @@ const DEFAULT_TIMERS = [
     { id: 'default-timer-5', title: 'study_session_45', type: 'countdown', initialDuration: 2700000, remaining: 2700000, sound: 'gentle_chime', isRunning: false, isPinned: false }
 ];
 
-function formatTime(ms, type = 'countdown') {
-    if (ms <= 0) {
-        return type === 'count_to_date' ? getTranslation('event_finished', 'timer') || "¡Evento finalizado!" : "00:00:00";
-    }
-
-    const totalSeconds = Math.max(0, Math.floor(Math.max(0, ms) / 1000));
-
-    if (type === 'count_to_date') {
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600).toString().padStart(2, '0');
-        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-        if (days > 0) {
-            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }
-        return `${hours}:${minutes}:${seconds}`;
-    } else {
-        const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    }
-}
-
-function updateMainDisplay() {
-    const mainDisplay = document.querySelector('.tool-timer span');
-    if (!mainDisplay) return;
-
-    const pinnedTimer = findTimerById(pinnedTimerId);
-    const activeSection = document.querySelector('.section-timer.active');
-
-    if (pinnedTimer) {
-        const timeText = formatTime(pinnedTimer.remaining, pinnedTimer.type);
-        mainDisplay.textContent = timeText;
-        if (activeSection) {
-            document.title = `ProjectNocturne - ${timeText}`;
-        }
-        if (window.centralizedFontManager) {
-            window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
-        }
-    } else {
-        mainDisplay.textContent = formatTime(0, 'countdown');
-        if (activeSection) {
-            document.title = `ProjectNocturne - ${getTranslation('timer', 'tooltips')}`;
-        }
-    }
-    updatePinnedTimerNameDisplay();
-}
-
 function toggleTimersSection(type) {
     const grid = document.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
     if (!grid) return;
@@ -420,9 +371,6 @@ function pauseTimer(timerId) {
         }
     }
     delete timer.targetTime;
-
-    updateCardDisplay(timerId);
-    if(timer.id === pinnedTimerId) updateMainDisplay();
 
     updateTimerCardControls(timerId);
     updateMainControlsState();
@@ -990,6 +938,95 @@ function saveDefaultTimersOrder() {
     localStorage.setItem(DEFAULT_TIMERS_STORAGE_KEY, JSON.stringify(defaultTimersState));
 }
 
+function startCountdownTimer(timer) {
+    const timerLoop = () => {
+        if (!timer.isRunning) {
+            if (activeTimers.has(timer.id)) {
+                cancelAnimationFrame(activeTimers.get(timer.id));
+                activeTimers.delete(timer.id);
+            }
+            return;
+        }
+
+        const rawRemaining = timer.targetTime - Date.now();
+        timer.remaining = Math.max(0, rawRemaining);
+
+        updateCardDisplay(timer.id);
+        if (timer.id === pinnedTimerId) {
+            updateMainDisplay();
+            const activeSection = document.querySelector('.section-timer.active');
+            if (activeSection) {
+                document.title = `ProjectNocturne - ${formatTime(timer.remaining, timer.type)}`;
+            }
+        }
+
+        if (rawRemaining <= 0) {
+            handleTimerEnd(timer.id);
+        } else {
+            const frameId = requestAnimationFrame(timerLoop);
+            activeTimers.set(timer.id, frameId);
+        }
+    };
+    timerLoop();
+}
+
+function startCountToDateTimer(timer) {
+    const timerLoop = () => {
+        if (!timer.isRunning) {
+             if (activeTimers.has(timer.id)) {
+                cancelAnimationFrame(activeTimers.get(timer.id));
+                activeTimers.delete(timer.id);
+            }
+            return;
+        }
+
+        const rawRemaining = new Date(timer.targetDate).getTime() - Date.now();
+        timer.remaining = Math.max(0, rawRemaining);
+
+        updateCardDisplay(timer.id);
+        if (timer.id === pinnedTimerId) {
+            updateMainDisplay();
+            const activeSection = document.querySelector('.section-timer.active');
+            if (activeSection) {
+                document.title = `ProjectNocturne - ${formatTime(timer.remaining, timer.type)}`;
+            }
+        }
+
+        if (rawRemaining <= 0) {
+            handleTimerEnd(timer.id);
+        } else {
+            const frameId = requestAnimationFrame(timerLoop);
+            activeTimers.set(timer.id, frameId);
+        }
+    };
+    timerLoop();
+}
+
+
+function formatTime(ms, type = 'countdown') {
+    if (ms <= 0) {
+        return type === 'count_to_date' ? getTranslation('event_finished', 'timer') || "¡Evento finalizado!" : "00:00:00";
+    }
+
+    const totalSeconds = Math.max(0, Math.floor(Math.max(0, ms) / 1000));
+
+    if (type === 'count_to_date') {
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        if (days > 0) {
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+        return `${hours}:${minutes}:${seconds}`;
+    } else {
+        const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    }
+}
+
 function addTimerAndRender(timerData, sectionId = 'user') {
     const newTimer = {
         id: `timer-${Date.now()}`,
@@ -1085,6 +1122,22 @@ function applyTimerCollapsedSectionsState() {
             }
         }
     });
+}
+
+function updateMainDisplay() {
+    const mainDisplay = document.querySelector('.tool-timer span');
+    if (!mainDisplay) return;
+
+    const pinnedTimer = findTimerById(pinnedTimerId);
+    if (pinnedTimer) {
+        mainDisplay.textContent = formatTime(pinnedTimer.remaining, pinnedTimer.type);
+        if (window.centralizedFontManager) {
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
+        }
+    } else {
+        mainDisplay.textContent = formatTime(0, 'countdown');
+    }
+    updatePinnedTimerNameDisplay();
 }
 
 function updateCardDisplay(timerId) {
