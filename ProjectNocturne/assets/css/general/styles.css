@@ -102,7 +102,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 990;
+    z-index: 999;
 }
 
 .sidebar-wrapper.mobile-sidebar .sidebar {
@@ -474,6 +474,7 @@ body {
 
 .menu-section-top {
     padding: 8px;
+    z-index: 999;
     border-bottom: 1px solid #00000020;
 }
 
@@ -816,6 +817,7 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
     width: 100%;
     height: 100%;
 }

@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <div class="menu-content-scrolleable overflow-y">
+        <div class="menu-content-scrolleable">
             <form id="feedback-form" class="creation-wrapper">
                 <div class="menu-section-center overflow-y">
                     <div class="menu-content-wrapper active">

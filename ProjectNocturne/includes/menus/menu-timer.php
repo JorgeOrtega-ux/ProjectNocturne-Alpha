@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="menu-content-scrolleable overflow-y">
+        <div class="menu-content-scrolleable">
             <div class="search-results-wrapper disabled"></div>
             <div class="creation-wrapper active">
                 <div class="menu-section-selector">
