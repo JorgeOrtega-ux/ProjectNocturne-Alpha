@@ -38,19 +38,11 @@
     border-color: #000000;
 }
 
-.menu-button.menu-button--primary:hover {
-    background-color: #333333;
-}
-
 /* Danger Button (e.g., Delete) */
 .menu-button.menu-button--danger {
     background-color: #d32f2f;
     color: #ffffff;
     border-color: #d32f2f;
-}
-
-.menu-button.menu-button--danger:hover {
-    background-color: #b71c1c;
 }
 
 .menu-button .spinning {
@@ -76,6 +68,7 @@
 .enter-text-tool>input {
     width: 100%;
     height: 90%;
+    border-radius: 8px;
     padding: 0 12px;
     color: #000000;
     background-color: transparent;
@@ -1845,6 +1838,10 @@
     border: none;
     border-radius: 8px;
     resize: none;
+}
+
+.feedback-text:focus {
+    outline: none;
 }
 
 #feedback-form {
