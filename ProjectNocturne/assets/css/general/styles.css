@@ -1451,3 +1451,10 @@ body {
     gap: 4px;
     padding-right: 8px;
 }
+
+/* --- ESTILOS MODIFICADOS --- */
+.search-result-item.alarm-disabled .result-info,
+.search-result-item.timer-finished .result-info {
+    opacity: 0.5;
+}
+/* --- FIN DE ESTILOS MODIFICADOS --- */

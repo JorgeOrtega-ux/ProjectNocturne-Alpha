@@ -684,6 +684,9 @@ function createTimerSearchResultItem(timer) {
     item.dataset.id = timer.id;
     item.dataset.type = 'timer';
 
+    // *** FIX ***: Add the 'timer-finished' class if the timer is finished.
+    item.classList.toggle('timer-finished', !timer.isRunning && timer.remaining <= 0 && !timer.rangAt);
+
     const translatedTitle = timer.id.startsWith('default-timer-') ? getTranslation(timer.title, 'timer') : timer.title;
     const time = formatTime(timer.remaining, timer.type);
     const controlsState = getTimerControlsState(timer);
@@ -1132,13 +1135,14 @@ function updateCardDisplay(timerId) {
 
     const mainCard = document.getElementById(timerId);
     const searchItem = document.getElementById(`search-timer-${timerId}`);
+    const isFinished = !timer.isRunning && timer.remaining <= 0 && !timer.rangAt;
 
     if (mainCard) {
         const timeElement = mainCard.querySelector('.card-value');
         if (timeElement) {
             timeElement.textContent = formatTime(timer.remaining, timer.type);
         }
-        mainCard.classList.toggle('timer-finished', !timer.isRunning && timer.remaining <= 0 && !timer.rangAt);
+        mainCard.classList.toggle('timer-finished', isFinished);
     }
 
     if (searchItem) {
@@ -1146,6 +1150,8 @@ function updateCardDisplay(timerId) {
         if (timeElement) {
             timeElement.textContent = formatTime(timer.remaining, timer.type);
         }
+        // *** FIX ***: Add/remove the class on the search item as well.
+        searchItem.classList.toggle('timer-finished', isFinished);
     }
 
     if (timer.id === pinnedTimerId && window.centralizedFontManager) {
