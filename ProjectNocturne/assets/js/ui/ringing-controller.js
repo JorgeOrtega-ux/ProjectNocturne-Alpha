@@ -124,9 +124,7 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
         window.ringingState.tools[toolId] = { ...data, toolType, onDismiss, onSnooze, onRestart, rangAt: Date.now() };
     }
 
-    if (!isModuleActive('toggleNotificationsOverlay')) {
-        activateModule('toggleNotificationsOverlay');
-    }
+    activateModule('toggleNotificationsOverlay');
 
     // El contenido del setTimeout se ha movido aquí directamente
     const latestTool = getLatestRingingTool();

@@ -245,19 +245,28 @@ function activateModule(moduleName, options = {}) {
     if (!config || moduleState.isModuleChanging) {
         return;
     }
+
+    const previouslyActiveModule = getActiveModule();
+    const isSameModuleContainer = previouslyActiveModule === normalizedName;
+
     moduleState.isModuleChanging = true;
-    deactivateAllModules({ source: 'new-module-activation' });
+
+    if (!isSameModuleContainer) {
+        deactivateAllModules({ source: 'new-module-activation' });
+    }
 
     const moduleElement = getModuleElementByName(normalizedName);
     if (moduleElement) {
-        moduleElement.classList.remove('disabled');
-        moduleElement.classList.add('active');
-        moduleState.modules[normalizedName].active = true;
+        if (!isSameModuleContainer) {
+            moduleElement.classList.remove('disabled');
+            moduleElement.classList.add('active');
+            moduleState.modules[normalizedName].active = true;
+        }
 
         if (config.type === MODULE_TYPES.CONTROL_CENTER) {
             showControlCenterMenu(moduleState.modules.controlCenter.currentMenu);
         } else if (config.type === MODULE_TYPES.OVERLAY) {
-             activateOverlayContainer(moduleName, options);
+            activateOverlayContainer(moduleName, options);
         }
     }
 
@@ -329,12 +338,20 @@ function activateOverlayContainer(originalToggleName, options = {}) {
         moduleState.modules.overlayContainer.active = true;
 
         const overlayToShow = getOverlayFromToggle(originalToggleName);
+        const currentOverlay = moduleState.modules.overlayContainer.currentOverlay;
+
+        if (currentOverlay && currentOverlay !== overlayToShow) {
+            const currentOverlayElement = domCache.overlays[currentOverlay];
+            if (currentOverlayElement) {
+                currentOverlayElement.classList.remove('active');
+                currentOverlayElement.classList.add('disabled');
+            }
+            resetMenuForOverlay(currentOverlay);
+        }
 
         if (overlayToShow) {
             showSpecificOverlay(overlayToShow);
             moduleState.modules.overlayContainer.currentOverlay = overlayToShow;
-            // A CORRECCIÓN: Se elimina la condición if (options.context) 
-            // para que el menú siempre se inicialice.
             initializeMenuForOverlay(overlayToShow, options);
         }
     }

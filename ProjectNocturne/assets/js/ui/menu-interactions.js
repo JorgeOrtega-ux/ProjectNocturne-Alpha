@@ -5,6 +5,7 @@ import { addTimerAndRender, updateTimer } from '../features/timer-controller.js'
 import { showDynamicIslandNotification } from './notification-controller.js';
 import { playSound, stopSound, generateSoundList, handleAudioUpload, deleteUserAudio, getSoundNameById } from '../features/general-tools.js';
 import { getCurrentLocation } from '../services/location-manager.js';
+import { clearSearchColors } from './color-search-system.js';
 
 let onConfirmCallback = null;
 let activeModalType = null;
@@ -290,7 +291,12 @@ function getMenuElement(menuName) {
         'timeZone': '.menu-timeZone[data-menu="timeZone"]',
         'menuFeedbackTypes': '.menu-feedback-types[data-menu="feedbackTypes"]',
         'menuFeedback': '.menu-feedback[data-menu="feedback"]',
-        'createSection': '.menu-create-section[data-menu="createSection"]'
+        'createSection': '.menu-create-section[data-menu="createSection"]',
+        'menuPaletteColors': '.menu-paletteColors[data-menu="paletteColors"]',
+        'menuSounds': '.menu-sounds[data-menu="sounds"]',
+        'menuCountry': '.menu-country[data-menu="country"]',
+        'menuDelete': '.menu-delete[data-menu="delete"]',
+        'menuNotifications': '.menu-notifications[data-menu="notifications"]'
     };
     return document.querySelector(menuSelectorMap[menuName]);
 };
@@ -487,6 +493,50 @@ const resetFeedbackMenu = (menuElement) => {
         messageInputParent.classList.remove('input-error');
     }
 };
+
+const resetSearchableMenu = (menuElement) => {
+    if (!menuElement) return;
+    const searchInput = menuElement.querySelector('input[type="text"]');
+    if (searchInput) {
+        searchInput.value = '';
+        // Dispatch an 'input' event to ensure any attached listeners for clearing results are triggered
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+};
+
+function resetMenuForOverlay(menuName) {
+    const menuElement = getMenuElement(menuName);
+    if (!menuElement) return;
+    switch (menuName) {
+        case 'menuAlarm':
+            resetAlarmMenu(menuElement);
+            break;
+        case 'menuTimer':
+            resetTimerMenu(menuElement);
+            break;
+        case 'menuWorldClock':
+            resetWorldClockMenu(menuElement);
+            break;
+        case 'menuFeedback':
+            resetFeedbackMenu(menuElement);
+            break;
+        case 'menuPaletteColors':
+            if (typeof clearSearchColors === 'function') {
+                clearSearchColors();
+            }
+            break;
+        case 'menuSounds':
+        case 'menuCountry':
+        case 'menuTimeZone':
+            resetSearchableMenu(menuElement);
+            break;
+        case 'menuCreateSection':
+             resetCreateSectionMenu(menuElement);
+             break;
+        // Other menus like calendar, timePicker, delete, notifications, feedback-types don't hold complex state
+        // and are reset implicitly by being hidden and re-initialized, so no specific reset logic is needed here.
+    }
+}
 
 function prepareAlarmForEdit(alarmData) {
     const menuElement = getMenuElement('menuAlarm');
@@ -695,17 +745,6 @@ function initializeMenuForOverlay(menuName) {
         case 'menuAlarm': initializeAlarmMenu(menuElement); break;
         case 'menuTimer': initializeTimerMenu(menuElement); break;
         case 'menuWorldClock': initializeWorldClockMenu(menuElement); break;
-    }
-}
-
-function resetMenuForOverlay(menuName) {
-    const menuElement = getMenuElement(menuName);
-    if (!menuElement) return;
-    switch (menuName) {
-        case 'menuAlarm': resetAlarmMenu(menuElement); break;
-        case 'menuTimer': resetTimerMenu(menuElement); break;
-        case 'menuWorldClock': resetWorldClockMenu(menuElement); break;
-        case 'menuFeedback': resetFeedbackMenu(menuElement); break;
     }
 }
 
