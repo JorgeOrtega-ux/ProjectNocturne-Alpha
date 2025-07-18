@@ -712,7 +712,7 @@ function getAlarmCount() {
 }
 
 function getAlarmLimit() {
-    return 25;
+    return 100;
 }
 
 function createAlarm(title, hour, minute, sound, sectionId = 'user') {

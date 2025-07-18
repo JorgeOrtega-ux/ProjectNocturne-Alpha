@@ -65,7 +65,7 @@
     <div class="section-center">
         <div class="tool-content">
             <div class="tool-stopwatch">
-                <span>00:00:00.00</span>
+                <span>00:00<span class="fractional-seconds">.00</span></span>
             </div>
         </div>
     </div>

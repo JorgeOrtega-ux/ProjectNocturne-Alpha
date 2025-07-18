@@ -318,13 +318,13 @@ function getClockCount() {
 }
 
 function getClockLimit() {
-    return 50;
+    return 100;
 }
 
 function createAndStartClockCard(title, country, timezone, existingId = null, save = true) {
     const grid = document.querySelector('.world-clocks-grid');
     if (!grid) return;
-    const totalClockLimit = 50;
+    const totalClockLimit = 100;
     const totalCurrentClocks = grid.querySelectorAll('.tool-card').length;
     const hasLocalClock = document.querySelector('.local-clock-card');
     const actualCurrentClocks = hasLocalClock && existingId !== 'local' ? totalCurrentClocks - 1 : totalCurrentClocks;

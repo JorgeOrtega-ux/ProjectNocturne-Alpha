@@ -898,7 +898,7 @@ function getTimersCount() {
 }
 
 function getTimerLimit() {
-    return 25;
+    return 100;
 }
 
 function getRunningTimersCount() {
