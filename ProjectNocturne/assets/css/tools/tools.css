@@ -601,8 +601,8 @@
     position: absolute;
     top: 5px;
     right: 5px;
+    z-index: 980;
     display: flex;
-    z-index: 990;
     padding: 2px;
     gap: 4px;
     background: #ffffff;
@@ -951,6 +951,7 @@
 
 .tool-card:has(.card-dropdown-menu:not(.disabled)) {
     position: relative;
+    z-index: 990;
 }
 
 .expandable-card-toggle-btn {
