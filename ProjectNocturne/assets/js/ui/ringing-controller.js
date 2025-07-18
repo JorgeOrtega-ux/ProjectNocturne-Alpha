@@ -9,6 +9,39 @@ function clearAllRingingIntervals() {
     timeAgoIntervals = {};
 }
 
+/**
+ * Formatea el tiempo transcurrido en un formato detallado y legible.
+ * @param {number} timestamp - El momento en que sonó la herramienta.
+ * @returns {string} - El tiempo transcurrido formateado (ej: "1 minuto 30 segundos").
+ */
+function formatDetailedTimeSince(timestamp) {
+    const totalSeconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (totalSeconds < 0) return `0 ${getTranslation('seconds', 'timer')}`;
+
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const parts = [];
+    if (days > 0) parts.push(`${days} ${getTranslation('days', 'timer')}`);
+    if (hours > 0) parts.push(`${hours} ${getTranslation('hours', 'timer')}`);
+    if (minutes > 0) parts.push(`${minutes} ${getTranslation('minutes', 'timer')}`);
+    if (seconds > 0) parts.push(`${seconds} ${getTranslation('seconds', 'timer')}`);
+
+    if (parts.length > 2) {
+        // Muestra solo las dos unidades de tiempo más grandes (ej: "1 día 5 horas")
+        return parts.slice(0, 2).join(' ');
+    } else if (parts.length > 0) {
+        // Muestra una o dos unidades de tiempo (ej: "5 minutos 10 segundos" o "10 segundos")
+        return parts.join(' ');
+    } else {
+        // Si el tiempo es 0, muestra "0 segundos"
+        return `0 ${getTranslation('seconds', 'timer')}`;
+    }
+}
+
+
 function initializeRingingController() {
     window.ringingState = window.ringingState || { tools: {} };
 
@@ -222,7 +255,9 @@ function updateRingingUIDetail(toolId) {
 
     const updateTime = () => {
         if (timeAgoInput) {
-            timeAgoInput.value = `${Math.floor((Date.now() - toolData.rangAt) / 1000)}s`;
+            // **AQUÍ ESTÁ EL CAMBIO**
+            // Se utiliza la nueva función para mostrar el tiempo de forma detallada.
+            timeAgoInput.value = formatDetailedTimeSince(toolData.rangAt);
         }
     };
     updateTime();
