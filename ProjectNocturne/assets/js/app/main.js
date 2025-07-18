@@ -526,6 +526,9 @@ function handleKeyDown(e) {
     const activeSectionElement = document.querySelector(`.section-content > .active`);
     if (!activeSectionElement) return;
 
+    // Verificación para saber si hay alguna herramienta sonando
+    const isAnyToolRinging = window.ringingState && Object.keys(window.ringingState.tools).length > 0;
+
     if (ctrlOrMeta) {
         switch (key) {
             case 'm':
@@ -539,7 +542,7 @@ function handleKeyDown(e) {
         case 'everything':
             break;
         case 'alarm':
-            if (key === 'a') activeSectionElement.querySelector('[data-module="toggleMenuAlarm"]')?.click();
+            if (key === 'a' && !isAnyToolRinging) activeSectionElement.querySelector('[data-module="toggleMenuAlarm"]')?.click();
             break;
         case 'timer':
             if (key === ' ') {
@@ -558,7 +561,7 @@ function handleKeyDown(e) {
                     resetBtn.click();
                 }
             }
-            if (key === 'a') activeSectionElement.querySelector('[data-module="toggleMenuTimer"]')?.click();
+            if (key === 'a' && !isAnyToolRinging) activeSectionElement.querySelector('[data-module="toggleMenuTimer"]')?.click();
             break;
         case 'stopwatch':
             if (key === ' ') {
@@ -588,11 +591,10 @@ function handleKeyDown(e) {
             }
             break;
         case 'worldClock':
-            if (key === 'a') activeSectionElement.querySelector('[data-module="toggleMenuWorldClock"]')?.click();
+            if (key === 'a' && !isAnyToolRinging) activeSectionElement.querySelector('[data-module="toggleMenuWorldClock"]')?.click();
             break;
     }
 }
-
 
 function handleKeyUp(e) {
     if (!e.key) {
