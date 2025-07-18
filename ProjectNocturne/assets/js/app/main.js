@@ -3,14 +3,12 @@ import { initializeTextStyleManager } from '../features/general-tools.js';
 import { isGradientColor } from '../ui/palette-colors.js';
 import { populateHourSelectionMenu } from '../ui/menu-interactions.js';
 import { trackEvent } from '../services/event-tracker.js';
+import { updateTitleForSection } from '../core/title-manager.js';
 
 let use24HourFormat = localStorage.getItem('use24HourFormat') === 'false' ? false : true;
 let allowCardMovement = true;
 let keyboardShortcutsEnabled = true;
 
-// --- VARIABLE DE CONTROL ---
-// true: recuerda las secciones expandidas incluso al cambiar de herramienta.
-// false: colapsa las secciones al cambiar de herramienta.
 let rememberExpandedSectionsOnNav = false;
 
 const keyState = {};
@@ -94,7 +92,7 @@ function activateSection(sectionName, showLog = true) {
         activeSectionStates[sectionName] = true;
         sectionStates.activeSection = sectionName;
     }
-    
+
     if (oldSection) {
         oldSection.classList.remove('active');
         oldSection.classList.add('disabled');
@@ -111,12 +109,13 @@ function activateSection(sectionName, showLog = true) {
         logSectionStates();
     }
 
+    updateTitleForSection(sectionName);
     const event = new CustomEvent('sectionChanged', {
-        detail: { 
-            activeSection: sectionName, 
+        detail: {
+            activeSection: sectionName,
             previousSection: oldSectionName,
-            view: sectionStates.currentView, 
-            states: activeSectionStates 
+            view: sectionStates.currentView,
+            states: activeSectionStates
         }
     });
 
@@ -184,8 +183,29 @@ function initSectionManagement() {
             }
         });
     });
+
+    // Listen for state changes to update titles dynamically
+    document.addEventListener('alarmStateChanged', () => {
+        if (getActiveSection() === 'alarm') {
+            updateTitleForSection('alarm');
+        }
+    });
+
+    document.addEventListener('timerStateChanged', () => {
+        if (getActiveSection() === 'timer') {
+            updateTitleForSection('timer');
+        }
+    });
+
+    document.addEventListener('stopwatchStateChanged', () => {
+        if (getActiveSection() === 'stopwatch') {
+            updateTitleForSection('stopwatch');
+        }
+    });
+
     switchToToolsView(false);
 }
+
 
 function getActiveSection() {
     return sectionStates.activeSection;

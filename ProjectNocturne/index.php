@@ -55,6 +55,7 @@
     <script type="module" src="assets/js/app/init-app.js"></script>
     <script type="module" src="assets/js/app/main.js"></script>
     <script type="module" src="assets/js/core/translations-controller.js"></script>
+    <script type="module" src="assets/js/core/title-manager.js"></script>
     <script type="module" src="assets/js/services/location-manager.js"></script>
     <script type="module" src="assets/js/core/module-manager.js"></script>
     <script type="module" src="assets/js/services/theme-manager.js"></script>

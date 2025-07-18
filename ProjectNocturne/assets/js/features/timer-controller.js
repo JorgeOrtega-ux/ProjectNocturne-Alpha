@@ -463,6 +463,7 @@ function updateTimer(timerId, newData) {
     const titleForNotification = updatedTimer.id.startsWith('default-timer-') ? getTranslation(updatedTimer.title, 'timer') : updatedTimer.title;
     showDynamicIslandNotification('success', 'timer_updated', 'notifications', { title: titleForNotification });
     updateEverythingWidgets();
+    dispatchTimerStateChange();
 }
 
 function updateTimerCardVisuals(timer) {
@@ -1262,6 +1263,7 @@ function handlePinTimer(timerId) {
     updateMainControlsState();
     saveTimersToStorage();
     saveDefaultTimersOrder();
+    dispatchTimerStateChange();
 }
 
 function handleEditTimer(timerId) {
@@ -1336,6 +1338,7 @@ function handleDeleteTimer(timerId) {
                 title: originalTitle
             });
             updateEverythingWidgets();
+            dispatchTimerStateChange();
         });
     }, 50);
 }
@@ -1573,7 +1576,9 @@ function initializeTimerController() {
             saveTimersToStorage();
             saveDefaultTimersOrder();
         },
-        renderAllTimerCards
+        renderAllTimerCards,
+        getPinnedTimer: () => findTimerById(pinnedTimerId),
+        formatTime: formatTime
     };
 
     updateEverythingWidgets();

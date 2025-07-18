@@ -19,6 +19,10 @@ function getLapLimit() {
     return 1000;
 }
 
+function dispatchStopwatchStateChange() {
+    document.dispatchEvent(new CustomEvent('stopwatchStateChanged'));
+}
+
 function saveState() {
     const stateToSave = {
         isRunning: stopwatchState.isRunning,
@@ -62,7 +66,7 @@ function loadState() {
     updateButtonStates();
 }
 
-function formatTime(milliseconds) {
+function formatTime(milliseconds, forTitle = false) {
     const totalMs = Math.floor(milliseconds);
     const hours = Math.floor(totalMs / 3600000);
     const minutes = Math.floor((totalMs % 3600000) / 60000);
@@ -70,7 +74,7 @@ function formatTime(milliseconds) {
     const ms = totalMs % 1000;
 
     let timeString = '';
-    let fractionalString = ''; // Variable para los decimales
+    let fractionalString = '';
 
     if (hours > 0) {
         timeString += `${hours.toString().padStart(2, '0')}:`;
@@ -79,7 +83,6 @@ function formatTime(milliseconds) {
     timeString += `${minutes.toString().padStart(2, '0')}:`;
     timeString += `${seconds.toString().padStart(2, '0')}`;
 
-    // Construimos la parte fraccional por separado
     switch (stopwatchState.format) {
         case 's':
             break;
@@ -97,7 +100,10 @@ function formatTime(milliseconds) {
             break;
     }
 
-    // Unimos la parte principal con la fraccional (si existe)
+    if (forTitle) {
+        return timeString + fractionalString;
+    }
+
     if (fractionalString) {
         return `${timeString}<span class="fractional-seconds">${fractionalString}</span>`;
     }
@@ -106,7 +112,7 @@ function formatTime(milliseconds) {
 
 function updateDisplay() {
     const currentTime = stopwatchState.isRunning ? (Date.now() - stopwatchState.startTime) : stopwatchState.elapsedTime;
-    displayElement.innerHTML = formatTime(currentTime); // Cambiado a innerHTML
+    displayElement.innerHTML = formatTime(currentTime);
 }
 function getUpdateInterval() {
     switch (stopwatchState.format) {
@@ -143,6 +149,7 @@ function startStopwatch(isReload = false) {
     if (!isReload) {
         updateEverythingWidgets();
     }
+    dispatchStopwatchStateChange();
 }
 
 function stopStopwatch() {
@@ -156,6 +163,7 @@ function stopStopwatch() {
     updateButtonStates();
     saveState();
     updateEverythingWidgets();
+    dispatchStopwatchStateChange();
 }
 
 function resetStopwatch() {
@@ -175,6 +183,7 @@ function resetStopwatch() {
     updateButtonStates();
     saveState();
     updateEverythingWidgets();
+    dispatchStopwatchStateChange();
 }
 
 function recordLap() {
@@ -250,7 +259,6 @@ function isStopwatchRunning() {
     return stopwatchState.isRunning;
 }
 
-// Reemplaza esta función en /assets/js/features/stopwatch-controller.js
 function changeFormat() {
     const formats = ['ds', 'ms', 'sss', 's'];
     const currentIndex = formats.indexOf(stopwatchState.format);
@@ -265,8 +273,6 @@ function changeFormat() {
     updateDisplay();
     saveState();
 
-    // Ahora, simplemente le pedimos al gestor que ajuste el cronómetro.
-    // La nueva lógica se encargará de todo.
     if (window.centralizedFontManager) {
         window.centralizedFontManager.adjustAndApplyFontSizeToSection('stopwatch');
     }
@@ -285,7 +291,7 @@ function exportLaps() {
             const wb = XLSX.utils.book_new();
             const ws_data = [
                 [getTranslation("lap_header", "stopwatch"), getTranslation("time_header", "stopwatch"), getTranslation("total_time_header", "stopwatch")],
-                ...stopwatchState.laps.map(lap => [lap.lap, formatTime(lap.time), formatTime(lap.totalTime)])
+                ...stopwatchState.laps.map(lap => [lap.lap, formatTime(lap.time, true), formatTime(lap.totalTime, true)])
             ];
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
             XLSX.utils.book_append_sheet(wb, ws, "Laps");
@@ -345,7 +351,9 @@ function initializeStopwatch() {
 
 window.stopwatchController = {
     getStopwatchDetails,
-    isStopwatchRunning
+    isStopwatchRunning,
+    getStopwatchState: () => stopwatchState,
+    formatTime: formatTime
 };
 
 export { getLapLimit, initializeStopwatch };
