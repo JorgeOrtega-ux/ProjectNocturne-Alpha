@@ -45,6 +45,11 @@ body {
     color: unset;
     -webkit-background-clip: unset;
     -webkit-text-fill-color: unset;
+    white-space: nowrap;
+    /* --- LÍNEAS AÑADIDAS/MODIFICADAS --- */
+    display: inline-flex;      /* Activa el modo Flexbox */
+    align-items: baseline;    /* ¡La clave! Alinea el texto en su base */
+    line-height: 1;           /* Normaliza la altura de la línea */
 }
 
 /* ====================================== */
@@ -97,7 +102,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 990;
 }
 
 .sidebar-wrapper.mobile-sidebar .sidebar {

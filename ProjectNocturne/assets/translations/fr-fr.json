@@ -227,7 +227,7 @@
     "timezone": "Fuseau horaire",
     "world_clock": "Horloge mondiale",
     "change_format": "Changer le format",
-    "export_laps": "Exporter les tours"
+    "export_laps": "Exporter les tours (xlsx)"
   },
   "stopwatch": {
     "lap_header": "Tour",

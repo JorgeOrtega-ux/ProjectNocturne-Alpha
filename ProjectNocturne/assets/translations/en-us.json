@@ -60,7 +60,7 @@
     "feedback_error_server": "Server error, please try again later.",
     "feedback_error_sending": "Error sending feedback, please try again later.",
     "section_deleted": "Section '{name}' has been deleted.",
-     "section_updated_success": "Section '{name}' has been updated successfully.",
+    "section_updated_success": "Section '{name}' has been updated successfully.",
     "duplicate_section_name": "A section with the name '{name}' already exists."
   },
   "color_system": {
@@ -227,7 +227,7 @@
     "timezone": "Timezone",
     "world_clock": "World Clock",
     "change_format": "Change format",
-    "export_laps": "Export laps"
+    "export_laps": "Export laps (xlsx)"
   },
   "stopwatch": {
     "lap_header": "Lap",

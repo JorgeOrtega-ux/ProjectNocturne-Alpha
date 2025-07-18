@@ -70,6 +70,7 @@ function formatTime(milliseconds) {
     const ms = totalMs % 1000;
 
     let timeString = '';
+    let fractionalString = ''; // Variable para los decimales
 
     if (hours > 0) {
         timeString += `${hours.toString().padStart(2, '0')}:`;
@@ -78,31 +79,35 @@ function formatTime(milliseconds) {
     timeString += `${minutes.toString().padStart(2, '0')}:`;
     timeString += `${seconds.toString().padStart(2, '0')}`;
 
+    // Construimos la parte fraccional por separado
     switch (stopwatchState.format) {
         case 's':
             break;
         case 'ds':
-            timeString += `.${Math.floor(ms / 100).toString()}`;
+            fractionalString = `.${Math.floor(ms / 100).toString()}`;
             break;
         case 'ms':
-            timeString += `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
+            fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
             break;
         case 'sss':
-            timeString += `.${ms.toString().padStart(3, '0')}`;
+            fractionalString = `.${ms.toString().padStart(3, '0')}`;
             break;
         default:
-            timeString += `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
+            fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
             break;
     }
 
+    // Unimos la parte principal con la fraccional (si existe)
+    if (fractionalString) {
+        return `${timeString}<span class="fractional-seconds">${fractionalString}</span>`;
+    }
     return timeString;
 }
 
 function updateDisplay() {
     const currentTime = stopwatchState.isRunning ? (Date.now() - stopwatchState.startTime) : stopwatchState.elapsedTime;
-    displayElement.textContent = formatTime(currentTime);
+    displayElement.innerHTML = formatTime(currentTime); // Cambiado a innerHTML
 }
-
 function getUpdateInterval() {
     switch (stopwatchState.format) {
         case 's':

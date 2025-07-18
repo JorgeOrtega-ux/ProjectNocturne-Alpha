@@ -883,15 +883,33 @@ function updateLocalTime() {
     if (el) {
         const now = new Date();
         const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: !use24HourFormat };
-        el.textContent = now.toLocaleTimeString(navigator.language, options);
 
-        // Le pedimos al gestor que verifique y ajuste si es necesario
+        const parts = new Intl.DateTimeFormat(navigator.language, options).formatToParts(now);
+        const timeString = parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('');
+        const ampmString = parts.find(p => p.type === 'dayPeriod')?.value || '';
+
+        let ampmEl = el.querySelector('.ampm');
+        
+        // Si el span de am/pm no existe (o el formato cambió), lo creamos
+        if (!ampmEl || (ampmString && ampmEl.textContent === '')) {
+            el.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
+        } else {
+            // Si ya existe, solo actualizamos el nodo de texto de la hora
+            if (el.firstChild.nodeType === Node.TEXT_NODE) {
+                el.firstChild.nodeValue = timeString;
+            } else { // Fallback por si acaso
+                el.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
+            }
+            // Y nos aseguramos que el am/pm sea el correcto
+            if (ampmString) ampmEl.textContent = ampmString;
+            else ampmEl.textContent = '';
+        }
+
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
         }
     }
 }
-
 function handleEditAlarm(alarmId) {
     const alarmData = findAlarmById(alarmId);
     if (alarmData) {

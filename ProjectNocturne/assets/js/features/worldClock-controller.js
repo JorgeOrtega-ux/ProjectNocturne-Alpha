@@ -160,27 +160,33 @@ function updateDateTime(element, timezone) {
             timeZone: timezone
         };
         const currentAppLanguage = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'en-US';
-        const timeString = now.toLocaleTimeString(currentAppLanguage, timeOptions);
-        if (element.tagName === 'SPAN') {
-            element.textContent = timeString;
-            return;
-        }
-        if (element.classList.contains('tool-card')) {
-            const timeElement = element.querySelector('.card-value');
-            const dateElement = element.querySelector('.card-tag');
-            if (timeElement) {
-                timeElement.textContent = timeString;
-            }
-            if (dateElement) {
-                const isLocal = element.classList.contains('local-clock-card');
-                if (isLocal) {
-                    dateElement.textContent = now.toLocaleDateString(currentAppLanguage, {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        timeZone: timezone
-                    });
+        const parts = new Intl.DateTimeFormat(currentAppLanguage, timeOptions).formatToParts(now);
+        const timeString = parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('');
+        const ampmString = parts.find(p => p.type === 'dayPeriod')?.value || '';
+
+        const timeElement = element.classList.contains('tool-card') ? element.querySelector('.card-value') : element;
+
+        if (timeElement) {
+            let ampmEl = timeElement.querySelector('.ampm');
+            if (!ampmEl || (ampmString && ampmEl.textContent === '')) {
+                timeElement.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
+            } else {
+                if (timeElement.firstChild.nodeType === Node.TEXT_NODE) {
+                    timeElement.firstChild.nodeValue = timeString;
+                } else {
+                    timeElement.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
                 }
+                if (ampmString) ampmEl.textContent = ampmString;
+                else ampmEl.textContent = '';
+            }
+        }
+
+        if (element.classList.contains('tool-card')) {
+            const dateElement = element.querySelector('.card-tag');
+            if (dateElement && element.classList.contains('local-clock-card')) {
+                dateElement.textContent = now.toLocaleDateString(currentAppLanguage, {
+                    weekday: 'short', month: 'short', day: 'numeric', timeZone: timezone
+                });
             }
         }
     } catch (error) {
@@ -570,16 +576,27 @@ function updateMainPinnedDisplay(card) {
         if (!timeEl) return;
         const now = new Date();
         const timeOptions = {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: !use24HourFormat,
-            timeZone: timezone
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: !use24HourFormat, timeZone: timezone
         };
         const currentAppLanguage = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'en-US';
-        timeEl.textContent = now.toLocaleTimeString(currentAppLanguage, timeOptions);
         
-        // Le pedimos al gestor que verifique y ajuste si es necesario
+        const parts = new Intl.DateTimeFormat(currentAppLanguage, timeOptions).formatToParts(now);
+        const timeString = parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('');
+        const ampmString = parts.find(p => p.type === 'dayPeriod')?.value || '';
+
+        let ampmEl = timeEl.querySelector('.ampm');
+        if (!ampmEl || (ampmString && ampmEl.textContent === '')) {
+            timeEl.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
+        } else {
+            if (timeEl.firstChild.nodeType === Node.TEXT_NODE) {
+                timeEl.firstChild.nodeValue = timeString;
+            } else {
+                timeEl.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
+            }
+            if (ampmString) ampmEl.textContent = ampmString;
+            else ampmEl.textContent = '';
+        }
+        
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
         }
@@ -630,15 +647,15 @@ function initializeWorldClockSortable() {
 
         onMove: function (evt) {
             if (evt.related.classList.contains('local-clock-card')) {
-                return false; 
+                return false;
             }
         },
-        
+
         onEnd: function (evt) {
             document.body.style.cursor = '';
             const newOrderIds = Array.from(evt.to.children)
-                                     .filter(el => !el.classList.contains('local-clock-card'))
-                                     .map(item => item.id);
+                .filter(el => !el.classList.contains('local-clock-card'))
+                .map(item => item.id);
 
             userClocks.sort((a, b) => {
                 return newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id);

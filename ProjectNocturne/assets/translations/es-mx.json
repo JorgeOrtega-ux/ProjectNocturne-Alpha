@@ -227,7 +227,7 @@
     "timezone": "Zona horaria",
     "world_clock": "Reloj mundial",
     "change_format": "Cambiar formato",
-    "export_laps": "Exportar vueltas"
+    "export_laps": "Exportar vueltas (xlsx)"
   },
   "stopwatch": {
     "lap_header": "Vuelta",

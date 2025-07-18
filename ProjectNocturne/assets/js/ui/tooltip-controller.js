@@ -236,8 +236,11 @@ function cleanupAllTooltips() {
 }
 
 function showTooltip(element) {
-    // Si la pantalla es de tamaño móvil, no se muestra el tooltip.
-    if (window.innerWidth <= 468) {
+    // Usamos 'pointer: coarse' para detectar dispositivos táctiles (móviles/tablets)
+    // de una manera más fiable que solo con el ancho de la pantalla.
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+    if (isTouchDevice) {
         hideTooltip(); // Se asegura de ocultar cualquier tooltip que haya quedado visible.
         return;
     }

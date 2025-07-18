@@ -191,6 +191,20 @@ function toggleTimeFormat() {
     use24HourFormat = !use24HourFormat;
     localStorage.setItem('use24HourFormat', use24HourFormat);
     updateTimeFormatInAllSections();
+
+    // --- LÓGICA AÑADIDA ---
+    // Llamamos al gestor de fuentes para que compruebe y ajuste el tamaño
+    // en las secciones afectadas después de que el formato de hora cambie.
+    if (window.centralizedFontManager) {
+        // Usamos un pequeño retardo para asegurar que el DOM se haya actualizado
+        // con el nuevo formato de hora antes de hacer el cálculo.
+        setTimeout(() => {
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
+        }, 50);
+    }
+    // --- FIN DE LA LÓGICA AÑADIDA ---
+
     const timePickerMenu = document.querySelector('.menu-timePicker[data-menu="timePicker"]');
     if (timePickerMenu && timePickerMenu.classList.contains('active')) {
         populateHourSelectionMenu();
@@ -513,14 +527,7 @@ function handleKeyDown(e) {
 
     switch (activeSectionName) {
         case 'everything':
-            if (key === 'a') {
-                e.preventDefault();
-                activeSectionElement.querySelector('[data-action="toggle-add-menu"]')?.click();
-            }
-            if (ctrlOrMeta && key === 'c') {
-                e.preventDefault();
-                activeSectionElement.querySelector('[data-action="toggle-time-format"]')?.click();
-            }
+            // Lógica para 'A' y 'Ctrl+C' eliminada de aquí
             break;
         case 'alarm':
             if (key === 'a') activeSectionElement.querySelector('[data-module="toggleMenuAlarm"]')?.click();

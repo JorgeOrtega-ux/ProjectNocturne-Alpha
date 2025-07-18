@@ -340,7 +340,7 @@ async function generateSoundList(uploadElement, listElement, actionName, activeS
     const userAudios = availableSounds.filter(s => s.isCustom);
 
     const defaultSoundsHeader = document.createElement('div');
-    defaultSoundsHeader.className = 'menu-content-header-sm';
+    defaultSoundsHeader.className = 'menu-content-header'; // Corregido
     defaultSoundsHeader.innerHTML = `<span>${getTranslation('default_audios', 'sounds')}</span>`;
     soundListContainer.appendChild(defaultSoundsHeader);
     defaultSounds.forEach(sound => {
@@ -350,7 +350,7 @@ async function generateSoundList(uploadElement, listElement, actionName, activeS
 
     if (userAudios.length > 0) {
         const userAudiosHeader = document.createElement('div');
-        userAudiosHeader.className = 'menu-content-header-sm';
+        userAudiosHeader.className = 'menu-content-header'; // Corregido
         userAudiosHeader.innerHTML = `<span>${getTranslation('uploaded_audios', 'sounds')}</span>`;
         soundListContainer.appendChild(userAudiosHeader);
         userAudios.forEach(sound => {

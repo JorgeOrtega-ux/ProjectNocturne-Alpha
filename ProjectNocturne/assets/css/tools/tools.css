@@ -1382,4 +1382,21 @@
 #ringing-detail-view {
     flex-direction: column;
     gap: 8px;
+}/* Estilo para el indicador AM/PM en los relojes */
+/* Estilo para el indicador AM/PM en los relojes */
+.ampm {
+    font-size: 0.4em;
+    font-weight: 500;
+    margin-left: 0.2em;
+    padding-bottom: 0.1em;
+    /* --- Optimizaciones de Renderizado para Evitar Parpadeo --- */
+    display: inline-block; /* Requerido para que 'transform' funcione correctamente */
+    -webkit-backface-visibility: hidden; /* Ayuda a prevenir parpadeos en navegadores WebKit */
+    backface-visibility: hidden;
+    transform: translateZ(0); /* Fuerza la aceleración por hardware y estabiliza el renderizado */
+}/* Estilo para los segundos fraccionales en el cronómetro */
+.fractional-seconds {
+    font-size: 0.4em; /* Hacemos la fuente un 40% más pequeña */
+    font-weight: 500;
+    opacity: 0.8; /* Ligeramente más sutil */
 }
