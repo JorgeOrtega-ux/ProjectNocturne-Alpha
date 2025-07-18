@@ -572,6 +572,9 @@ function createSearchResultItem(alarm) {
     item.dataset.id = alarm.id;
     item.dataset.type = 'alarm';
 
+    // Línea añadida para reflejar el estado de la alarma
+    item.classList.toggle('alarm-disabled', !alarm.enabled);
+
     const translatedTitle = alarm.type === 'default' ? getTranslation(alarm.title, 'alarms') : alarm.title;
     const time = formatTime(alarm.hour, alarm.minute);
     const controlsState = getAlarmControlsState(alarm);

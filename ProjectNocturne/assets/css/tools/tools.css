@@ -702,6 +702,18 @@
     transition: background-color 0.2s ease;
 }
 
+/* --- ESTILOS AÑADIDOS --- */
+.search-result-item.alarm-disabled,
+.search-result-item.timer-finished {
+    opacity: 0.5;
+}
+
+.search-result-item.alarm-disabled .result-info,
+.search-result-item.timer-finished .result-info {
+    opacity: 1; /* Asegura que el texto siga siendo legible */
+}
+/* --- FIN DE ESTILOS AÑADIDOS --- */
+
 .search-result-item .result-info {
     display: flex;
     flex-direction: column;
