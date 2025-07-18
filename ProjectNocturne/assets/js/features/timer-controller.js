@@ -25,6 +25,55 @@ const DEFAULT_TIMERS = [
     { id: 'default-timer-5', title: 'study_session_45', type: 'countdown', initialDuration: 2700000, remaining: 2700000, sound: 'gentle_chime', isRunning: false, isPinned: false }
 ];
 
+function formatTime(ms, type = 'countdown') {
+    if (ms <= 0) {
+        return type === 'count_to_date' ? getTranslation('event_finished', 'timer') || "¡Evento finalizado!" : "00:00:00";
+    }
+
+    const totalSeconds = Math.max(0, Math.floor(Math.max(0, ms) / 1000));
+
+    if (type === 'count_to_date') {
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        if (days > 0) {
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+        return `${hours}:${minutes}:${seconds}`;
+    } else {
+        const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    }
+}
+
+function updateMainDisplay() {
+    const mainDisplay = document.querySelector('.tool-timer span');
+    if (!mainDisplay) return;
+
+    const pinnedTimer = findTimerById(pinnedTimerId);
+    const activeSection = document.querySelector('.section-timer.active');
+
+    if (pinnedTimer) {
+        const timeText = formatTime(pinnedTimer.remaining, pinnedTimer.type);
+        mainDisplay.textContent = timeText;
+        if (activeSection) {
+            document.title = `ProjectNocturne - ${timeText}`;
+        }
+        if (window.centralizedFontManager) {
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
+        }
+    } else {
+        mainDisplay.textContent = formatTime(0, 'countdown');
+        if (activeSection) {
+            document.title = `ProjectNocturne - ${getTranslation('timer', 'tooltips')}`;
+        }
+    }
+    updatePinnedTimerNameDisplay();
+}
+
 function toggleTimersSection(type) {
     const grid = document.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
     if (!grid) return;
@@ -358,7 +407,7 @@ function pauseTimer(timerId) {
 
     timer.isRunning = false;
     if (activeTimers.has(timer.id)) {
-        clearTimeout(activeTimers.get(timer.id));
+        cancelAnimationFrame(activeTimers.get(timer.id));
         activeTimers.delete(timer.id);
     }
 
@@ -371,6 +420,9 @@ function pauseTimer(timerId) {
         }
     }
     delete timer.targetTime;
+
+    updateCardDisplay(timerId);
+    if(timer.id === pinnedTimerId) updateMainDisplay();
 
     updateTimerCardControls(timerId);
     updateMainControlsState();
@@ -388,7 +440,7 @@ function resetTimer(timerId) {
 
     timer.isRunning = false;
     if (activeTimers.has(timerId)) {
-        clearTimeout(activeTimers.get(timer.id));
+        cancelAnimationFrame(activeTimers.get(timerId));
         activeTimers.delete(timer.id);
     }
 
@@ -419,7 +471,7 @@ function updateTimer(timerId, newData) {
     if (timerIndex === -1 && defaultTimerIndex === -1) return;
 
     if (activeTimers.has(timerId)) {
-        clearTimeout(activeTimers.get(timerId));
+        cancelAnimationFrame(activeTimers.get(timerId));
         activeTimers.delete(timerId);
     }
 
@@ -685,7 +737,6 @@ function createTimerSearchResultItem(timer) {
     item.dataset.id = timer.id;
     item.dataset.type = 'timer';
 
-    // *** FIX ***: Add the 'timer-finished' class if the timer is finished.
     item.classList.toggle('timer-finished', !timer.isRunning && timer.remaining <= 0 && !timer.rangAt);
 
     const translatedTitle = timer.id.startsWith('default-timer-') ? getTranslation(timer.title, 'timer') : timer.title;
@@ -814,7 +865,7 @@ function handleTimerEnd(timerId) {
 
     timer.isRunning = false;
     if (activeTimers.has(timerId)) {
-        clearTimeout(activeTimers.get(timerId));
+        cancelAnimationFrame(activeTimers.get(timerId));
         activeTimers.delete(timerId);
     }
     timer.remaining = 0;
@@ -939,84 +990,6 @@ function saveDefaultTimersOrder() {
     localStorage.setItem(DEFAULT_TIMERS_STORAGE_KEY, JSON.stringify(defaultTimersState));
 }
 
-function startCountdownTimer(timer) {
-    const tick = () => {
-        if (!timer.isRunning) {
-            if (activeTimers.has(timer.id)) {
-                clearTimeout(activeTimers.get(timer.id));
-                activeTimers.delete(timer.id);
-            }
-            return;
-        }
-
-        const rawRemaining = timer.targetTime - Date.now();
-        timer.remaining = Math.max(0, rawRemaining);
-
-        updateCardDisplay(timer.id);
-        if (timer.id === pinnedTimerId) updateMainDisplay();
-
-        if (rawRemaining <= 0) {
-            handleTimerEnd(timer.id);
-        } else {
-            const msUntilNextSecond = 1000 - (new Date().getMilliseconds());
-            const timeoutId = setTimeout(tick, msUntilNextSecond);
-            activeTimers.set(timer.id, timeoutId);
-        }
-    };
-    tick();
-}
-
-function startCountToDateTimer(timer) {
-    const tick = () => {
-        if (!timer.isRunning) {
-            if (activeTimers.has(timer.id)) {
-                clearTimeout(activeTimers.get(timer.id));
-                activeTimers.delete(timer.id);
-            }
-            return;
-        }
-
-        const rawRemaining = new Date(timer.targetDate).getTime() - Date.now();
-        timer.remaining = Math.max(0, rawRemaining);
-
-        updateCardDisplay(timer.id);
-        if (timer.id === pinnedTimerId) updateMainDisplay();
-
-        if (rawRemaining <= 0) {
-            handleTimerEnd(timer.id);
-        } else {
-            const msUntilNextSecond = 1000 - (new Date().getMilliseconds());
-            const timeoutId = setTimeout(tick, msUntilNextSecond);
-            activeTimers.set(timer.id, timeoutId);
-        }
-    };
-    tick();
-}
-
-function formatTime(ms, type = 'countdown') {
-    if (ms <= 0) {
-        return type === 'count_to_date' ? getTranslation('event_finished', 'timer') || "¡Evento finalizado!" : "00:00:00";
-    }
-
-    const totalSeconds = Math.max(0, Math.floor(Math.max(0, ms) / 1000));
-
-    if (type === 'count_to_date') {
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600).toString().padStart(2, '0');
-        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-        if (days > 0) {
-            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }
-        return `${hours}:${minutes}:${seconds}`;
-    } else {
-        const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-        const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    }
-}
-
 function addTimerAndRender(timerData, sectionId = 'user') {
     const newTimer = {
         id: `timer-${Date.now()}`,
@@ -1114,22 +1087,6 @@ function applyTimerCollapsedSectionsState() {
     });
 }
 
-function updateMainDisplay() {
-    const mainDisplay = document.querySelector('.tool-timer span');
-    if (!mainDisplay) return;
-
-    const pinnedTimer = findTimerById(pinnedTimerId);
-    if (pinnedTimer) {
-        mainDisplay.textContent = formatTime(pinnedTimer.remaining, pinnedTimer.type);
-        if (window.centralizedFontManager) {
-            window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
-        }
-    } else {
-        mainDisplay.textContent = formatTime(0, 'countdown');
-    }
-    updatePinnedTimerNameDisplay();
-}
-
 function updateCardDisplay(timerId) {
     const timer = findTimerById(timerId);
     if (!timer) return;
@@ -1151,7 +1108,6 @@ function updateCardDisplay(timerId) {
         if (timeElement) {
             timeElement.textContent = formatTime(timer.remaining, timer.type);
         }
-        // *** FIX ***: Add/remove the class on the search item as well.
         searchItem.classList.toggle('timer-finished', isFinished);
     }
 
@@ -1301,7 +1257,7 @@ function handleDeleteTimer(timerId) {
         showModal('confirmation', { type: 'timer', name: timerName }, () => {
             trackEvent('interaction', 'delete_timer');
             if (activeTimers.has(timerId)) {
-                clearTimeout(activeTimers.get(timerId));
+                cancelAnimationFrame(activeTimers.get(timerId));
                 activeTimers.delete(timerId);
             }
             const originalTitle = timerToDelete.id.startsWith('default-timer-') ? getTranslation(timerToDelete.title, 'timer') : timerToDelete.title;

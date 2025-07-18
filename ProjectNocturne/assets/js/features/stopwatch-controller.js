@@ -9,7 +9,7 @@ const stopwatchState = {
     elapsedTime: 0,
     lapNumber: 0,
     laps: [],
-    timerInterval: null,
+    animationFrameId: null, // Reemplaza a timerInterval
     format: 'ms',
 };
 
@@ -54,7 +54,11 @@ function loadState() {
         stopwatchState.elapsedTime = Date.now() - stopwatchState.startTime;
         startStopwatch(true);
     } else {
-        updateDisplay();
+        // Asegura que el display inicial esté correcto incluso si no está corriendo
+        const currentTime = stopwatchState.elapsedTime;
+        if (displayElement) {
+            displayElement.innerHTML = formatTime(currentTime);
+        }
     }
 
     if (stopwatchState.laps.length > 0) {
@@ -84,82 +88,70 @@ function formatTime(milliseconds, forTitle = false) {
     timeString += `${seconds.toString().padStart(2, '0')}`;
 
     switch (stopwatchState.format) {
-        case 's':
-            break;
-        case 'ds':
-            fractionalString = `.${Math.floor(ms / 100).toString()}`;
-            break;
-        case 'ms':
-            fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
-            break;
-        case 'sss':
-            fractionalString = `.${ms.toString().padStart(3, '0')}`;
-            break;
-        default:
-            fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`;
-            break;
+        case 's': break;
+        case 'ds': fractionalString = `.${Math.floor(ms / 100).toString()}`; break;
+        case 'ms': fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`; break;
+        case 'sss': fractionalString = `.${ms.toString().padStart(3, '0')}`; break;
+        default: fractionalString = `.${Math.floor(ms / 10).toString().padStart(2, '0')}`; break;
     }
 
-    if (forTitle) {
-        return timeString + fractionalString;
-    }
-
-    if (fractionalString) {
-        return `${timeString}<span class="fractional-seconds">${fractionalString}</span>`;
-    }
-    return timeString;
+    if (forTitle) return timeString;
+    return fractionalString ? `${timeString}<span class="fractional-seconds">${fractionalString}</span>` : timeString;
 }
 
 function updateDisplay() {
     const currentTime = stopwatchState.isRunning ? (Date.now() - stopwatchState.startTime) : stopwatchState.elapsedTime;
-    displayElement.innerHTML = formatTime(currentTime);
-}
-function getUpdateInterval() {
-    switch (stopwatchState.format) {
-        case 's':
-            return 1000;
-        case 'ds':
-            return 100;
-        case 'ms':
-        case 'sss':
-        default:
-            return 10;
+    
+    if (displayElement) {
+        displayElement.innerHTML = formatTime(currentTime);
+    }
+
+    const activeSection = document.querySelector('.section-stopwatch.active');
+    if (activeSection) {
+        if (stopwatchState.isRunning) {
+            document.title = `ProjectNocturne - ${formatTime(currentTime, true)}`;
+        } else {
+            // Si está pausado o reseteado, muestra el tiempo actual estático o el título por defecto
+            const title = stopwatchState.elapsedTime > 0 ? formatTime(stopwatchState.elapsedTime, true) : getTranslation('stopwatch', 'tooltips');
+            document.title = `ProjectNocturne - ${title}`;
+        }
+    }
+
+    if (stopwatchState.isRunning) {
+        stopwatchState.animationFrameId = requestAnimationFrame(updateDisplay);
     }
 }
 
 function startStopwatch(isReload = false) {
     if (stopwatchState.isRunning && !isReload) return;
-
-    if (!isReload) {
-        trackEvent('interaction', 'start_stopwatch');
-    }
+    if (!isReload) trackEvent('interaction', 'start_stopwatch');
 
     stopwatchState.isRunning = true;
-
     if (!isReload) {
         stopwatchState.startTime = Date.now() - stopwatchState.elapsedTime;
     }
-
-    clearInterval(stopwatchState.timerInterval);
-    const interval = getUpdateInterval();
-    stopwatchState.timerInterval = setInterval(updateDisplay, interval);
+    
+    if (stopwatchState.animationFrameId) cancelAnimationFrame(stopwatchState.animationFrameId);
+    stopwatchState.animationFrameId = requestAnimationFrame(updateDisplay);
 
     updateButtonStates();
     saveState();
-    if (!isReload) {
-        updateEverythingWidgets();
-    }
+    if (!isReload) updateEverythingWidgets();
     dispatchStopwatchStateChange();
 }
 
 function stopStopwatch() {
     if (!stopwatchState.isRunning) return;
-
     trackEvent('interaction', 'stop_stopwatch');
 
     stopwatchState.isRunning = false;
+    if (stopwatchState.animationFrameId) {
+        cancelAnimationFrame(stopwatchState.animationFrameId);
+        stopwatchState.animationFrameId = null;
+    }
+    
     stopwatchState.elapsedTime = Date.now() - stopwatchState.startTime;
-    clearInterval(stopwatchState.timerInterval);
+    updateDisplay(); // Actualiza una última vez para mostrar el tiempo detenido
     updateButtonStates();
     saveState();
     updateEverythingWidgets();
@@ -170,14 +162,17 @@ function resetStopwatch() {
     trackEvent('interaction', 'reset_stopwatch');
     
     stopwatchState.isRunning = false;
-    clearInterval(stopwatchState.timerInterval);
+    if (stopwatchState.animationFrameId) {
+        cancelAnimationFrame(stopwatchState.animationFrameId);
+        stopwatchState.animationFrameId = null;
+    }
 
     stopwatchState.elapsedTime = 0;
     stopwatchState.startTime = 0;
     stopwatchState.lapNumber = 0;
     stopwatchState.laps = [];
 
-    updateDisplay();
+    updateDisplay(); // Llama a updateDisplay para resetear la vista y el título
     lapsTableBody.innerHTML = '';
     sectionBottom.classList.add('disabled');
     updateButtonStates();
@@ -188,11 +183,8 @@ function resetStopwatch() {
 
 function recordLap() {
     if (!stopwatchState.isRunning) return;
-
     trackEvent('interaction', 'record_lap');
-
     const lapLimit = getLapLimit();
-
     if (stopwatchState.lapNumber >= lapLimit) {
         showDynamicIslandNotification(
             'error',
@@ -202,19 +194,16 @@ function recordLap() {
         );
         return;
     }
-
     const lapTime = Date.now() - stopwatchState.startTime;
     const previousLapTime = stopwatchState.laps.length > 0 ? stopwatchState.laps[stopwatchState.laps.length - 1].totalTime : 0;
     const lapDuration = lapTime - previousLapTime;
     stopwatchState.lapNumber++;
-
     const lapData = {
         lap: stopwatchState.lapNumber,
         time: lapDuration,
         totalTime: lapTime
     };
     stopwatchState.laps.push(lapData);
-
     renderLap(lapData);
     sectionBottom.classList.remove('disabled');
     saveState();
@@ -247,11 +236,9 @@ function getStopwatchDetails() {
     const time = formatTime(state.isRunning ? (Date.now() - state.startTime) : state.elapsedTime);
     const statusKey = state.isRunning ? 'running' : 'paused';
     const statusText = getTranslation(statusKey, 'stopwatch');
-
     if (state.elapsedTime === 0 && !state.isRunning) {
         return getTranslation('paused', 'stopwatch') + ' en 00.00';
     }
-
     return `${statusText} en ${time}`;
 }
 
@@ -263,12 +250,6 @@ function changeFormat() {
     const formats = ['ds', 'ms', 'sss', 's'];
     const currentIndex = formats.indexOf(stopwatchState.format);
     stopwatchState.format = formats[(currentIndex + 1) % formats.length];
-
-    if (stopwatchState.isRunning) {
-        clearInterval(stopwatchState.timerInterval);
-        const newInterval = getUpdateInterval();
-        stopwatchState.timerInterval = setInterval(updateDisplay, newInterval);
-    }
     
     updateDisplay();
     saveState();
@@ -277,9 +258,9 @@ function changeFormat() {
         window.centralizedFontManager.adjustAndApplyFontSizeToSection('stopwatch');
     }
 }
+
 function exportLaps() {
     trackEvent('interaction', 'export_laps');
-
     const iconContainer = exportLapsBtn.querySelector('.material-symbols-rounded');
     const originalIconHTML = iconContainer.innerHTML;
 

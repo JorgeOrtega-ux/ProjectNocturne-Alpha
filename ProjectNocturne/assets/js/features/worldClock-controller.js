@@ -562,8 +562,6 @@ function handleDeleteClock(clockId) {
     }, 50);
 }
 
-
-// Reemplaza esta función en /assets/js/features/worldClock-controller.js
 function updateMainPinnedDisplay(card) {
     if (mainDisplayInterval) {
         clearInterval(mainDisplayInterval);
@@ -572,6 +570,7 @@ function updateMainPinnedDisplay(card) {
     if (!pinnedDisplay) return;
     const timeEl = pinnedDisplay.querySelector('span');
     const timezone = card.dataset.timezone;
+
     function update() {
         if (!timeEl) return;
         const now = new Date();
@@ -597,6 +596,13 @@ function updateMainPinnedDisplay(card) {
             else ampmEl.textContent = '';
         }
         
+        // Actualización sincronizada del título
+        const activeSection = document.querySelector('.section-worldClock.active');
+        if (activeSection) {
+            const titleTimeString = now.toLocaleTimeString(navigator.language, timeOptions);
+            document.title = `ProjectNocturne - ${titleTimeString}`;
+        }
+
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
         }

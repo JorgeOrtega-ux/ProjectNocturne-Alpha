@@ -1,8 +1,5 @@
 import { getTranslation } from './translations-controller.js';
 
-let timerUpdateInterval = null;
-let stopwatchUpdateInterval = null; 
-
 function updateTitle(newTitle) {
     document.title = newTitle;
 }
@@ -12,9 +9,8 @@ function formatTitle(pageName) {
 }
 
 function updateTitleForSection(sectionName) {
-    clearInterval(timerUpdateInterval);
-    clearInterval(stopwatchUpdateInterval);
-
+    // Esta función ahora solo maneja los títulos estáticos.
+    // Los controladores de cada herramienta se encargarán de sus propios títulos dinámicos.
     switch (sectionName) {
         case 'everything':
             updateTitle(formatTitle(getTranslation('everything', 'tooltips')));
@@ -28,57 +24,27 @@ function updateTitleForSection(sectionName) {
                 updateTitle(formatTitle(getTranslation('alarms', 'tooltips')));
             }
             break;
+        
+        // Se elimina la gestión de 'timer', 'stopwatch' y 'worldClock' de aquí
+        // para que sus controladores tengan control total y se evite el parpadeo.
         case 'timer':
-            if (window.timerManager) {
-                const pinnedTimer = window.timerManager.getPinnedTimer();
-                if (pinnedTimer && pinnedTimer.isRunning) {
-                    const update = () => {
-                        const currentTimerState = window.timerManager.getPinnedTimer();
-                        if (currentTimerState && currentTimerState.isRunning && currentTimerState.id === pinnedTimer.id) {
-                            const remainingTime = window.timerManager.formatTime(currentTimerState.remaining);
-                            updateTitle(formatTitle(remainingTime));
-                        } else {
-                            clearInterval(timerUpdateInterval);
-                             updateTitle(formatTitle(getTranslation('timer', 'tooltips')));
-                        }
-                    };
-                    update();
-                    timerUpdateInterval = setInterval(update, 1000);
-                } else {
-                    updateTitle(formatTitle(getTranslation('timer', 'tooltips')));
-                }
-            } else {
-                updateTitle(formatTitle(getTranslation('timer', 'tooltips')));
-            }
-            break;
         case 'stopwatch':
-            if (window.stopwatchController) {
-                const stopwatchState = window.stopwatchController.getStopwatchState();
-                if (stopwatchState.isRunning) {
-                    const update = () => {
-                        const currentState = window.stopwatchController.getStopwatchState();
-                        if (currentState.isRunning) {
-                            const currentTime = window.stopwatchController.formatTime(Date.now() - currentState.startTime, true); 
-                            updateTitle(formatTitle(currentTime));
-                        } else {
-                            clearInterval(stopwatchUpdateInterval);
-                            updateTitle(formatTitle(getTranslation('stopwatch', 'tooltips')));
-                        }
-                    };
-                    update();
-                    stopwatchUpdateInterval = setInterval(update, 100); 
-                } else {
-                    updateTitle(formatTitle(getTranslation('stopwatch', 'tooltips')));
-                }
-            } else {
-                updateTitle(formatTitle(getTranslation('stopwatch', 'tooltips')));
-            }
-            break;
         case 'worldClock':
-            updateTitle(formatTitle(getTranslation('world_clock', 'tooltips')));
+            // No hacer nada aquí. El controlador se encargará.
             break;
+
         default:
-            updateTitle('ProjectNocturne');
+             // Maneja los títulos de las páginas legales
+            let titleKey;
+            if (sectionName === 'privacy-policy') titleKey = 'privacy_title';
+            else if (sectionName === 'terms-conditions') titleKey = 'terms_title';
+            else if (sectionName === 'cookies-policy') titleKey = 'cookies_title';
+
+            if (titleKey) {
+                updateTitle(formatTitle(getTranslation(titleKey, 'legal_docs')));
+            } else {
+                updateTitle('ProjectNocturne');
+            }
             break;
     }
 }
