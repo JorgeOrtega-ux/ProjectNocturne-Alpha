@@ -659,6 +659,10 @@
 
 .dark-mode .clock-date {
     color: #ffffffe6;
+    background: #ffffff20;
+    padding: 4px 12px;
+    border-radius: 50px;
+    border-color: #ffffff20;
 }
 
 .dark-mode .menu-content-header-sm {

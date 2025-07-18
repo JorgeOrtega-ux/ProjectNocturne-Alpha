@@ -1208,6 +1208,10 @@
 
 .clock-content {
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .clock-time {
@@ -1217,8 +1221,13 @@
 }
 
 .clock-date {
+    width: max-content;
     font-size: 1.2rem;
     color: #000000e6;
+    background: #f5f5fa;
+    border: 1px solid transparent;
+    padding: 4px 12px;
+    border-radius: 50px;
 }
 
 @media (max-width: 768px) {
@@ -1374,6 +1383,7 @@
 .dark-mode .ringing-restore-btn:hover {
     background-color: #ffffff20;
 }
+
 .dark-mode .menu-button {
     color: #fff;
     border-color: #ffffff20;
@@ -1382,7 +1392,9 @@
 #ringing-detail-view {
     flex-direction: column;
     gap: 8px;
-}/* Estilo para el indicador AM/PM en los relojes */
+}
+
+/* Estilo para el indicador AM/PM en los relojes */
 /* Estilo para el indicador AM/PM en los relojes */
 .ampm {
     font-size: 0.4em;
@@ -1390,13 +1402,26 @@
     margin-left: 0.2em;
     padding-bottom: 0.1em;
     /* --- Optimizaciones de Renderizado para Evitar Parpadeo --- */
-    display: inline-block; /* Requerido para que 'transform' funcione correctamente */
-    -webkit-backface-visibility: hidden; /* Ayuda a prevenir parpadeos en navegadores WebKit */
+    display: inline-block;
+    /* Requerido para que 'transform' funcione correctamente */
+    -webkit-backface-visibility: hidden;
+    /* Ayuda a prevenir parpadeos en navegadores WebKit */
     backface-visibility: hidden;
-    transform: translateZ(0); /* Fuerza la aceleración por hardware y estabiliza el renderizado */
-}/* Estilo para los segundos fraccionales en el cronómetro */
+    transform: translateZ(0);
+    /* Fuerza la aceleración por hardware y estabiliza el renderizado */
+}
+
+/* Estilo para los segundos fraccionales en el cronómetro */
 .fractional-seconds {
-    font-size: 0.4em; /* Hacemos la fuente un 40% más pequeña */
+    font-size: 0.4em;
+    /* Hacemos la fuente un 40% más pequeña */
     font-weight: 500;
-    opacity: 0.8; /* Ligeramente más sutil */
+}
+
+/* Resetea el estilo de los segundos fraccionales solo dentro de la tabla de vueltas */
+.laps-table .fractional-seconds {
+    font-size: inherit;
+    /* Hereda el tamaño de la celda de la tabla, volviendo a la normalidad */
+    font-weight: inherit;
+    /* Hereda el grosor normal del texto */
 }
