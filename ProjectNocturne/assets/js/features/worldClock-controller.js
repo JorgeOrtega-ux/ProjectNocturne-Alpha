@@ -619,6 +619,7 @@ function initializeWorldClockSortable() {
         fallbackClass: 'tool-card-dragging',
 
         onStart: function () {
+            document.body.style.cursor = 'grabbing';
             setTimeout(() => {
                 const fallbackElement = document.querySelector('.tool-card-dragging');
                 if (fallbackElement) {
@@ -634,6 +635,7 @@ function initializeWorldClockSortable() {
         },
         
         onEnd: function (evt) {
+            document.body.style.cursor = '';
             const newOrderIds = Array.from(evt.to.children)
                                      .filter(el => !el.classList.contains('local-clock-card'))
                                      .map(item => item.id);

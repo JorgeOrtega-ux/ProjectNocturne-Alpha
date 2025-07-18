@@ -6,7 +6,7 @@ import { showDynamicIslandNotification, hideDynamicIsland } from '../ui/notifica
 import { updateEverythingWidgets } from '../features/everything-controller.js';
 import { showModal } from '../ui/menu-interactions.js';
 import { trackEvent } from '../services/event-tracker.js';
-import { showRingingScreen } from '../ui/ringing-controller.js';
+import { showRingingScreen, hideRingingScreen } from '../ui/ringing-controller.js';
 
 const TIMERS_STORAGE_KEY = 'user-timers';
 const TIMER_SECTIONS_STORAGE_KEY = 'user-timer-sections';
@@ -847,6 +847,7 @@ function handleTimerEnd(timerId) {
 
 function dismissTimer(timerId) {
     stopSound(timerId);
+    hideRingingScreen(timerId); // <-- CORRECCIÓN AÑADIDA
 
     const card = document.getElementById(timerId);
     if (card) {
@@ -877,7 +878,6 @@ function dismissTimer(timerId) {
         dispatchTimerStateChange();
     }
 }
-
 function getTimersCount() {
     return userTimers.length;
 }
@@ -1349,6 +1349,7 @@ function initializeTimerSortable() {
             forceFallback: true,
             fallbackClass: 'tool-card-dragging',
              onStart: function () { 
+                document.body.style.cursor = 'grabbing';
                 setTimeout(() => {
                     const fallbackElement = document.querySelector('.tool-card-dragging');
                     if (fallbackElement) {
@@ -1357,6 +1358,7 @@ function initializeTimerSortable() {
                 }, 0);
             },
             onEnd: function (evt) {
+                document.body.style.cursor = '';
                 const wrapper = document.querySelector('.timers-list-wrapper');
                 const newOrderIds = Array.from(wrapper.querySelectorAll('.timers-container'))
                     .map(el => el.dataset.container);
@@ -1383,6 +1385,7 @@ function initializeTimerSortable() {
             fallbackClass: 'tool-card-dragging',
 
             onStart: function () {
+                document.body.style.cursor = 'grabbing';
                 setTimeout(() => {
                     const fallbackElement = document.querySelector('.tool-card-dragging');
                     if (fallbackElement) {
@@ -1392,6 +1395,7 @@ function initializeTimerSortable() {
             },
 
             onEnd: function (evt) {
+                document.body.style.cursor = '';
                 if (evt.from !== evt.to) {
                     return;
                 }

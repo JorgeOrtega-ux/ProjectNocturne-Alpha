@@ -6,7 +6,8 @@ import { updateEverythingWidgets } from '../features/everything-controller.js';
 import { getTranslation } from '../core/translations-controller.js';
 import { showModal } from '../ui/menu-interactions.js';
 import { trackEvent } from '../services/event-tracker.js';
-import { showRingingScreen } from '../ui/ringing-controller.js';
+import { showRingingScreen, hideRingingScreen } from '../ui/ringing-controller.js';
+
 
 const ALARMS_STORAGE_KEY = 'user-alarms';
 const ALARM_SECTIONS_STORAGE_KEY = 'user-alarm-sections';
@@ -456,6 +457,7 @@ function triggerAlarm(alarm) {
 
 function dismissAlarm(alarmId) {
     stopSound(alarmId);
+    hideRingingScreen(alarmId); // <-- CORRECCIÓN AÑADIDA
 
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
@@ -961,6 +963,7 @@ function initializeAlarmSortable() {
             forceFallback: true,
             fallbackClass: 'tool-card-dragging',
              onStart: function () { 
+                document.body.style.cursor = 'grabbing';
                 setTimeout(() => {
                     const fallbackElement = document.querySelector('.tool-card-dragging');
                     if (fallbackElement) {
@@ -969,6 +972,7 @@ function initializeAlarmSortable() {
                 }, 0);
             },
             onEnd: function (evt) {
+                document.body.style.cursor = '';
                 const wrapper = document.querySelector('.alarms-list-wrapper');
                 const newOrderIds = Array.from(wrapper.querySelectorAll('.alarms-container'))
                                        .map(el => el.dataset.container);
@@ -995,6 +999,7 @@ function initializeAlarmSortable() {
             fallbackClass: 'tool-card-dragging',
 
             onStart: function () {
+                document.body.style.cursor = 'grabbing';
                 setTimeout(() => {
                     const fallbackElement = document.querySelector('.tool-card-dragging');
                     if (fallbackElement) {
@@ -1003,6 +1008,7 @@ function initializeAlarmSortable() {
                 }, 0);
             },
             onEnd: function (evt) {
+                document.body.style.cursor = '';
                 if (evt.from !== evt.to) {
                     return;
                 }
