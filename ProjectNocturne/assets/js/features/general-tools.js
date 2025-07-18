@@ -843,7 +843,7 @@ function initializeCentralizedFontManager() {
         element.style.fontSize = currentSize;
         return overflows;
     }
-    function adjustAndApplyFontSizeToSection(sectionName) {
+function adjustAndApplyFontSizeToSection(sectionName) {
         const container = clockContainers[sectionName];
         const element = clockElements[sectionName];
         const display = fontSizeDisplays[sectionName];
@@ -856,10 +856,30 @@ function initializeCentralizedFontManager() {
         const baseSize = calculateBaseFontSize(container.offsetWidth);
         if (baseSize === 0) return;
 
+        // Primero, aplicamos el tamaño de fuente según el factor de escala global
         const calculatedSize = baseSize * globalScaleFactor;
         const finalSize = roundToEvenNumber(calculatedSize);
         element.style.fontSize = finalSize + 'px';
         display.textContent = finalSize + ' px';
+
+        // --- LÓGICA DE ROBUSTEZ GLOBAL ---
+        // Inmediatamente después de aplicar el tamaño, verificamos si hay desbordamiento.
+        // Esto se encarga tanto del reajuste por resize/zoom como por cambio de contenido.
+        const fitText = () => {
+            if (element.scrollWidth > container.offsetWidth) {
+                // La función 'decreaseFontSize' ya es específica de la sección
+                const success = decreaseFontSizeForSection(sectionName);
+                if (success) {
+                    // Si se pudo reducir, vuelve a comprobar en el siguiente fotograma
+                    requestAnimationFrame(fitText);
+                }
+            }
+        };
+        // Iniciamos la comprobación de seguridad.
+        fitText();
+        // --- FIN DE LA LÓGICA ---
+
+        // Finalmente, actualizamos el estado de los botones.
         updateFontButtonStatesForSection(sectionName);
     }
     function adjustAndApplyFontSizeToAllSections() {
@@ -938,10 +958,11 @@ function initializeCentralizedFontManager() {
         }
         return false;
     }
-    function decreaseFontSize() {
-        const firstSection = Object.keys(clockElements)[0];
-        if (firstSection) {
-            return decreaseFontSizeForSection(firstSection);
+function decreaseFontSize(sectionName) {
+        // Si se especifica una sección, la usamos. Si no, usamos la primera como antes.
+        const targetSection = sectionName || Object.keys(clockElements)[0];
+        if (targetSection) {
+            return decreaseFontSizeForSection(targetSection);
         }
         return false;
     }
@@ -1024,6 +1045,33 @@ function initializeCentralizedFontManager() {
         getCurrentActualSize: getCurrentActualFontSizePublic,
         adjustAndApplyFontSizeToAll: adjustAndApplyFontSizeToAllSections,
         adjustAndApplyFontSizeToSection: adjustAndApplyFontSizeToSection,
+        
+        // --- FUNCIÓN NUEVA Y CLAVE ---
+        ensureTextFits: function(sectionName) {
+            if (!isInitialized || !sectionName) return;
+
+            // Usamos requestAnimationFrame para asegurar que el DOM se haya actualizado
+            requestAnimationFrame(() => {
+                const element = clockElements[sectionName];
+                const container = clockContainers[sectionName];
+
+                if (!element || !container) return;
+
+                // Función recursiva que se ejecuta hasta que el texto quepa
+                const fitText = () => {
+                    if (element.scrollWidth > container.offsetWidth) {
+                        // Llama a la versión interna y específica de decreaseFontSize
+                        const success = decreaseFontSize(sectionName);
+                        if (success) {
+                            // Si se pudo reducir, vuelve a comprobar
+                            requestAnimationFrame(fitText);
+                        }
+                    }
+                };
+                fitText();
+            });
+        },
+        
         updateAllButtonStates: function () {
             sections.forEach(function updateSection(sectionName) {
                 if (clockContainers[sectionName]) {

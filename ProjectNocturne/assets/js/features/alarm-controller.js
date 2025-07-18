@@ -875,12 +875,18 @@ function toggleAlarmsSection(type) {
     btn.classList.toggle('expanded', isActive);
 }
 
+// Reemplaza esta función en /assets/js/features/alarm-controller.js
 function updateLocalTime() {
     const el = document.querySelector('.tool-alarm span');
     if (el) {
         const now = new Date();
         const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: !use24HourFormat };
         el.textContent = now.toLocaleTimeString(navigator.language, options);
+
+        // Le pedimos al gestor que verifique y ajuste si es necesario
+        if (window.centralizedFontManager) {
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
+        }
     }
 }
 

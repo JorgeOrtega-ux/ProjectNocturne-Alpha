@@ -557,6 +557,7 @@ function handleDeleteClock(clockId) {
 }
 
 
+// Reemplaza esta función en /assets/js/features/worldClock-controller.js
 function updateMainPinnedDisplay(card) {
     if (mainDisplayInterval) {
         clearInterval(mainDisplayInterval);
@@ -577,6 +578,11 @@ function updateMainPinnedDisplay(card) {
         };
         const currentAppLanguage = typeof window.getCurrentLanguage === 'function' ? window.getCurrentLanguage() : 'en-US';
         timeEl.textContent = now.toLocaleTimeString(currentAppLanguage, timeOptions);
+        
+        // Le pedimos al gestor que verifique y ajuste si es necesario
+        if (window.centralizedFontManager) {
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
+        }
     }
     update();
     mainDisplayInterval = setInterval(update, 1000);

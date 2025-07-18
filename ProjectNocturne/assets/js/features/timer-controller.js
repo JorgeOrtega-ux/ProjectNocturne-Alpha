@@ -1084,6 +1084,10 @@ function updateMainDisplay() {
     const pinnedTimer = findTimerById(pinnedTimerId);
     if (pinnedTimer) {
         mainDisplay.textContent = formatTime(pinnedTimer.remaining, pinnedTimer.type);
+        // --- LLAMADA A LA FUNCIÓN DE AJUSTE ---
+        if (window.centralizedFontManager) {
+            window.centralizedFontManager.ensureTextFits('timer');
+        }
     } else {
         mainDisplay.textContent = formatTime(0, 'countdown');
     }
@@ -1110,6 +1114,11 @@ function updateCardDisplay(timerId) {
         if (timeElement) {
             timeElement.textContent = formatTime(timer.remaining, timer.type);
         }
+    }
+
+    // --- LLAMADA A LA FUNCIÓN DE AJUSTE (SOLO PARA EL RELOJ PRINCIPAL) ---
+    if (timer.id === pinnedTimerId && window.centralizedFontManager) {
+        window.centralizedFontManager.ensureTextFits('timer');
     }
 }
 

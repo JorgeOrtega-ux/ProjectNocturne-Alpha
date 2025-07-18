@@ -245,11 +245,12 @@ function isStopwatchRunning() {
     return stopwatchState.isRunning;
 }
 
+// Reemplaza esta función en /assets/js/features/stopwatch-controller.js
 function changeFormat() {
     const formats = ['ds', 'ms', 'sss', 's'];
     const currentIndex = formats.indexOf(stopwatchState.format);
     stopwatchState.format = formats[(currentIndex + 1) % formats.length];
-    
+
     if (stopwatchState.isRunning) {
         clearInterval(stopwatchState.timerInterval);
         const newInterval = getUpdateInterval();
@@ -258,8 +259,13 @@ function changeFormat() {
     
     updateDisplay();
     saveState();
-}
 
+    // Ahora, simplemente le pedimos al gestor que ajuste el cronómetro.
+    // La nueva lógica se encargará de todo.
+    if (window.centralizedFontManager) {
+        window.centralizedFontManager.adjustAndApplyFontSizeToSection('stopwatch');
+    }
+}
 function exportLaps() {
     trackEvent('interaction', 'export_laps');
 
