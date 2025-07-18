@@ -1,4 +1,4 @@
-import { use24HourFormat, activateModule, getCurrentActiveOverlay, allowCardMovement } from '../app/main.js';
+import { use24HourFormat, activateModule, getCurrentActiveOverlay, allowCardMovement, rememberExpandedSectionsOnNav } from '../app/main.js';
 import { prepareAlarmForEdit } from '../ui/menu-interactions.js';
 import { playSound, stopSound, getAvailableSounds, handleAlarmCardAction, getSoundNameById, createExpandableToolContainer, createToolCard } from '../features/general-tools.js';
 import { showDynamicIslandNotification, hideDynamicIsland } from '../ui/notification-controller.js';
@@ -13,6 +13,7 @@ const ALARMS_STORAGE_KEY = 'user-alarms';
 const ALARM_SECTIONS_STORAGE_KEY = 'user-alarm-sections';
 const DEFAULT_ALARMS_STORAGE_KEY = 'default-alarms-order';
 const LAST_VISIT_KEY = 'last-alarm-visit-timestamp';
+let expandedAlarmSections = new Set();
 
 const DEFAULT_ALARMS = [
     { id: 'default-2', title: 'lunch_time', hour: 13, minute: 0, sound: 'gentle_chime', enabled: false, type: 'default' },
@@ -23,6 +24,22 @@ const DEFAULT_ALARMS = [
 let userAlarms = [];
 let defaultAlarmsState = [];
 let alarmSections = [];
+
+function toggleAlarmsSection(type) {
+    const grid = document.querySelector(`.tool-grid[data-alarm-grid="${type}"]`);
+    if (!grid) return;
+    const container = grid.closest('.alarms-container');
+    if (!container) return;
+    const btn = container.querySelector('.expandable-card-toggle-btn');
+    const isActive = grid.classList.toggle('active');
+    btn.classList.toggle('expanded', isActive);
+
+    if (isActive) {
+        expandedAlarmSections.add(type);
+    } else {
+        expandedAlarmSections.delete(type);
+    }
+}
 
 function createAlarmSection(sectionName) {
     if (alarmSections.length >= 11) {
@@ -289,9 +306,8 @@ function updateAlarm(alarmId, newData) {
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
 
-    const oldSectionId = alarm.sectionId; // Guardamos la sección original
+    const oldSectionId = alarm.sectionId; 
 
-    // Verificamos si es una alarma predeterminada intentando cambiar de sección
     if (alarm.type === 'default' && newData.sectionId && oldSectionId !== newData.sectionId) {
         showDynamicIslandNotification('error', 'default_alarm_cant_change_section', 'alarms');
         return; 
@@ -299,7 +315,6 @@ function updateAlarm(alarmId, newData) {
 
     Object.assign(alarm, newData);
 
-    // Comparamos la nueva sección con la original
     if (newData.sectionId && oldSectionId !== alarm.sectionId) {
         renderAllAlarmCards(); 
     } else {
@@ -457,7 +472,7 @@ function triggerAlarm(alarm) {
 
 function dismissAlarm(alarmId) {
     stopSound(alarmId);
-    hideRingingScreen(alarmId); // <-- CORRECCIÓN AÑADIDA
+    hideRingingScreen(alarmId); 
 
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
@@ -751,8 +766,9 @@ function renderAllAlarmCards() {
             grid.appendChild(card);
         }
     });
-
-    // Re-initialize drag and drop functionality
+    
+    applyCollapsedSectionsState();
+    applySavedSectionOrder();
     initializeAlarmSortable();
 }
 
@@ -867,17 +883,25 @@ function formatTime(hour, minute) {
     return `${h12}:${String(minute).padStart(2, '0')} ${ampm}`;
 }
 
-function toggleAlarmsSection(type) {
-    const grid = document.querySelector(`.tool-grid[data-alarm-grid="${type}"]`);
-    if (!grid) return;
-    const container = grid.closest('.alarms-container');
-    if (!container) return;
-    const btn = container.querySelector('.expandable-card-toggle-btn');
-    const isActive = grid.classList.toggle('active');
-    btn.classList.toggle('expanded', isActive);
+function applyCollapsedSectionsState() {
+    document.querySelectorAll('.alarms-container').forEach(container => {
+        const type = container.dataset.container;
+        const grid = container.querySelector(`.tool-grid[data-alarm-grid="${type}"]`);
+        const btn = container.querySelector('.expandable-card-toggle-btn');
+
+        if (grid && btn) {
+            if (expandedAlarmSections.has(type)) {
+                grid.classList.add('active');
+                btn.classList.add('expanded');
+            } else {
+                grid.classList.remove('active');
+                btn.classList.remove('expanded');
+            }
+        }
+    });
 }
 
-// Reemplaza esta función en /assets/js/features/alarm-controller.js
+
 function updateLocalTime() {
     const el = document.querySelector('.tool-alarm span');
     if (el) {
@@ -890,17 +914,14 @@ function updateLocalTime() {
 
         let ampmEl = el.querySelector('.ampm');
         
-        // Si el span de am/pm no existe (o el formato cambió), lo creamos
         if (!ampmEl || (ampmString && ampmEl.textContent === '')) {
             el.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
         } else {
-            // Si ya existe, solo actualizamos el nodo de texto de la hora
             if (el.firstChild.nodeType === Node.TEXT_NODE) {
                 el.firstChild.nodeValue = timeString;
-            } else { // Fallback por si acaso
+            } else { 
                 el.innerHTML = `${timeString}<span class="ampm">${ampmString}</span>`;
             }
-            // Y nos aseguramos que el am/pm sea el correcto
             if (ampmString) ampmEl.textContent = ampmString;
             else ampmEl.textContent = '';
         }
@@ -974,8 +995,8 @@ function initializeAlarmSortable() {
             group: 'alarm-sections',
             animation: 150,
             handle: '.expandable-card-header',
-            delay: 200, // Retraso para iniciar el arrastre en ms
-            delayOnTouchOnly: true, // El retraso solo aplica a dispositivos táctiles
+            delay: 200, 
+            delayOnTouchOnly: true,
             filter: '.expandable-card-toggle-btn, .tool-grid, .card-menu-container',
             ghostClass: 'tool-card-placeholder',
             forceFallback: true,
@@ -1009,8 +1030,8 @@ function initializeAlarmSortable() {
         new Sortable(grid, {
             group: `alarms-cards-${grid.dataset.alarmGrid}`,
             animation: 150,
-            delay: 200, // Retraso para iniciar el arrastre en ms
-            delayOnTouchOnly: true, // El retraso solo aplica a dispositivos táctiles
+            delay: 200, 
+            delayOnTouchOnly: true, 
             filter: '.card-menu-container',
             ghostClass: 'tool-card-placeholder',
             forceFallback: true,
@@ -1203,6 +1224,17 @@ function initializeAlarmClock() {
             if (searchInput) {
                 searchInput.value = '';
                 renderAlarmSearchResults('');
+            }
+        }
+    });
+
+    document.addEventListener('sectionChanged', (e) => {
+        if (rememberExpandedSectionsOnNav === false) {
+            if (e.detail.previousSection === 'alarm' && e.detail.activeSection !== 'alarm') {
+                expandedAlarmSections.clear();
+            }
+            if (e.detail.activeSection === 'alarm') {
+                applyCollapsedSectionsState();
             }
         }
     });

@@ -1,5 +1,5 @@
 import { getTranslation } from '../core/translations-controller.js';
-import { activateModule, getCurrentActiveOverlay } from '../app/main.js';
+import { activateModule, getCurrentActiveOverlay, rememberExpandedSectionsOnNav } from '../app/main.js';
 import { prepareTimerForEdit, prepareCountToDateForEdit } from '../ui/menu-interactions.js';
 import { playSound, stopSound, getAvailableSounds, handleTimerCardAction, getSoundNameById, createExpandableToolContainer, createToolCard } from '../features/general-tools.js';
 import { showDynamicIslandNotification, hideDynamicIsland } from '../ui/notification-controller.js';
@@ -17,12 +17,29 @@ let defaultTimersState = [];
 let timerSections = [];
 let activeTimers = new Map();
 let pinnedTimerId = null;
+let expandedTimerSections = new Set();
 
 const DEFAULT_TIMERS = [
     { id: 'default-timer-2', title: 'short_break_5', type: 'countdown', initialDuration: 300000, remaining: 300000, sound: 'peaceful_tone', isRunning: false, isPinned: false },
     { id: 'default-timer-4', title: 'exercise_30', type: 'countdown', initialDuration: 1800000, remaining: 1800000, sound: 'digital_alarm', isRunning: false, isPinned: false },
     { id: 'default-timer-5', title: 'study_session_45', type: 'countdown', initialDuration: 2700000, remaining: 2700000, sound: 'gentle_chime', isRunning: false, isPinned: false }
 ];
+
+function toggleTimersSection(type) {
+    const grid = document.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
+    if (!grid) return;
+    const container = grid.closest('.timers-container');
+    if (!container) return;
+    const btn = container.querySelector('.expandable-card-toggle-btn');
+    const isActive = grid.classList.toggle('active');
+    btn.classList.toggle('expanded', isActive);
+
+    if (isActive) {
+        expandedTimerSections.add(type);
+    } else {
+        expandedTimerSections.delete(type);
+    }
+}
 
 function createTimerSection(sectionName) {
     if (timerSections.length >= 10) {
@@ -411,7 +428,6 @@ function updateTimer(timerId, newData) {
     const index = isUserTimer ? timerIndex : defaultTimerIndex;
     const oldTimer = targetArray[index];
 
-    // Verificar si es un temporizador predeterminado intentando cambiar de sección
     if (oldTimer.type === 'default' && newData.sectionId && oldTimer.sectionId !== newData.sectionId) {
         showDynamicIslandNotification('error', 'default_timer_cant_change_section', 'timers');
         return;
@@ -435,7 +451,6 @@ function updateTimer(timerId, newData) {
 
     if (isUserTimer) saveTimersToStorage(); else saveDefaultTimersOrder();
     
-    // Si la sección cambió, renderizar todas las tarjetas de nuevo
     if (newData.sectionId && oldTimer.sectionId !== newData.sectionId) {
         renderAllTimerCards();
     } else {
@@ -847,7 +862,7 @@ function handleTimerEnd(timerId) {
 
 function dismissTimer(timerId) {
     stopSound(timerId);
-    hideRingingScreen(timerId); // <-- CORRECCIÓN AÑADIDA
+    hideRingingScreen(timerId); 
 
     const card = document.getElementById(timerId);
     if (card) {
@@ -1070,14 +1085,31 @@ function renderAllTimerCards() {
             grid.appendChild(card);
         }
     });
-
-
+    
+    applyTimerCollapsedSectionsState();
+    applySavedTimerSectionOrder();
     updatePinnedStatesInUI();
-    // Re-initialize drag and drop functionality
     initializeTimerSortable();
-
 }
-// Reemplaza esta función en /assets/js/features/timer-controller.js
+
+function applyTimerCollapsedSectionsState() {
+    document.querySelectorAll('.timers-container').forEach(container => {
+        const type = container.dataset.container;
+        const grid = container.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
+        const btn = container.querySelector('.expandable-card-toggle-btn');
+
+        if (grid && btn) {
+            if (expandedTimerSections.has(type)) {
+                grid.classList.add('active');
+                btn.classList.add('expanded');
+            } else {
+                grid.classList.remove('active');
+                btn.classList.remove('expanded');
+            }
+        }
+    });
+}
+
 function updateMainDisplay() {
     const mainDisplay = document.querySelector('.tool-timer span');
     if (!mainDisplay) return;
@@ -1085,7 +1117,6 @@ function updateMainDisplay() {
     const pinnedTimer = findTimerById(pinnedTimerId);
     if (pinnedTimer) {
         mainDisplay.textContent = formatTime(pinnedTimer.remaining, pinnedTimer.type);
-        // Le pedimos al gestor que verifique y ajuste si es necesario
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
         }
@@ -1117,7 +1148,6 @@ function updateCardDisplay(timerId) {
         }
     }
 
-    // --- LLAMADA A LA FUNCIÓN DE AJUSTE (SOLO PARA EL RELOJ PRINCIPAL) ---
     if (timer.id === pinnedTimerId && window.centralizedFontManager) {
         window.centralizedFontManager.ensureTextFits('timer');
     }
@@ -1178,16 +1208,6 @@ function updatePinnedTimerNameDisplay() {
     if (window.tooltipManager && typeof window.tooltipManager.attachTooltipsToNewElements === 'function') {
         window.tooltipManager.attachTooltipsToNewElements(nameDisplayTool.parentElement);
     }
-}
-
-function toggleTimersSection(type) {
-    const grid = document.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
-    if (!grid) return;
-    const container = grid.closest('.timers-container');
-    if (!container) return;
-    const btn = container.querySelector('.expandable-card-toggle-btn');
-    const isActive = grid.classList.toggle('active');
-    btn.classList.toggle('expanded', isActive);
 }
 
 function updateTimerCounts() {
@@ -1342,8 +1362,8 @@ function initializeTimerSortable() {
             group: 'timer-sections',
             animation: 150,
             handle: '.expandable-card-header',
-            delay: 200, // Retraso para iniciar el arrastre en ms
-            delayOnTouchOnly: true, // El retraso solo aplica a dispositivos táctiles
+            delay: 200, 
+            delayOnTouchOnly: true, 
             filter: '.expandable-card-toggle-btn, .tool-grid, .card-menu-container',
             ghostClass: 'tool-card-placeholder',
             forceFallback: true,
@@ -1377,8 +1397,8 @@ function initializeTimerSortable() {
         new Sortable(grid, {
             group: `timers-cards-${grid.dataset.timerGrid}`,
             animation: 150,
-            delay: 200, // Retraso para iniciar el arrastre en ms
-            delayOnTouchOnly: true, // El retraso solo aplica a dispositivos táctiles
+            delay: 200, 
+            delayOnTouchOnly: true, 
             filter: '.card-menu-container',
             ghostClass: 'tool-card-placeholder',
             forceFallback: true,
@@ -1561,6 +1581,17 @@ function initializeTimerController() {
             if (searchInput) {
                 searchInput.value = '';
                 renderTimerSearchResults('');
+            }
+        }
+    });
+    
+    document.addEventListener('sectionChanged', (e) => {
+        if (rememberExpandedSectionsOnNav === false) {
+            if (e.detail.previousSection === 'timer' && e.detail.activeSection !== 'timer') {
+                expandedTimerSections.clear();
+            }
+            if (e.detail.activeSection === 'timer') {
+                applyTimerCollapsedSectionsState();
             }
         }
     });

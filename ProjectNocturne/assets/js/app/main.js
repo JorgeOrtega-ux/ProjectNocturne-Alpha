@@ -8,6 +8,11 @@ let use24HourFormat = localStorage.getItem('use24HourFormat') === 'false' ? fals
 let allowCardMovement = true;
 let keyboardShortcutsEnabled = true;
 
+// --- VARIABLE DE CONTROL ---
+// true: recuerda las secciones expandidas incluso al cambiar de herramienta.
+// false: colapsa las secciones al cambiar de herramienta.
+let rememberExpandedSectionsOnNav = false;
+
 const keyState = {};
 
 function initSidebarMobile() {
@@ -76,6 +81,9 @@ function logSectionStates() {
 }
 
 function activateSection(sectionName, showLog = true) {
+    const oldSection = document.querySelector('.section-content > .active');
+    const oldSectionName = oldSection ? oldSection.dataset.section : null;
+
     if (activeSectionStates[sectionName] === true) {
         return;
     }
@@ -86,11 +94,12 @@ function activateSection(sectionName, showLog = true) {
         activeSectionStates[sectionName] = true;
         sectionStates.activeSection = sectionName;
     }
-    const oldSection = document.querySelector('.section-content > .active');
+    
     if (oldSection) {
         oldSection.classList.remove('active');
         oldSection.classList.add('disabled');
     }
+
     const newSection = document.querySelector(`.section-content > [data-section="${sectionName}"]`);
     if (newSection) {
         newSection.classList.remove('disabled');
@@ -101,9 +110,16 @@ function activateSection(sectionName, showLog = true) {
     if (showLog) {
         logSectionStates();
     }
+
     const event = new CustomEvent('sectionChanged', {
-        detail: { activeSection: sectionName, view: sectionStates.currentView, states: activeSectionStates }
+        detail: { 
+            activeSection: sectionName, 
+            previousSection: oldSectionName,
+            view: sectionStates.currentView, 
+            states: activeSectionStates 
+        }
     });
+
     trackEvent('section_visit', sectionName);
     document.dispatchEvent(event);
 }
@@ -192,18 +208,12 @@ function toggleTimeFormat() {
     localStorage.setItem('use24HourFormat', use24HourFormat);
     updateTimeFormatInAllSections();
 
-    // --- LÓGICA AÑADIDA ---
-    // Llamamos al gestor de fuentes para que compruebe y ajuste el tamaño
-    // en las secciones afectadas después de que el formato de hora cambie.
     if (window.centralizedFontManager) {
-        // Usamos un pequeño retardo para asegurar que el DOM se haya actualizado
-        // con el nuevo formato de hora antes de hacer el cálculo.
         setTimeout(() => {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
         }, 50);
     }
-    // --- FIN DE LA LÓGICA AÑADIDA ---
 
     const timePickerMenu = document.querySelector('.menu-timePicker[data-menu="timePicker"]');
     if (timePickerMenu && timePickerMenu.classList.contains('active')) {
@@ -527,7 +537,6 @@ function handleKeyDown(e) {
 
     switch (activeSectionName) {
         case 'everything':
-            // Lógica para 'A' y 'Ctrl+C' eliminada de aquí
             break;
         case 'alarm':
             if (key === 'a') activeSectionElement.querySelector('[data-module="toggleMenuAlarm"]')?.click();
@@ -601,4 +610,4 @@ export { activateControlCenterMenu, activateModuleByName as activateModule, acti
 export { closeOverlayByName, closeOverlays, deactivateModule, dispatchModuleEvent, executeWhenModuleReady, getActiveModule, getActiveSection, getAllSectionStates };
 export { getAppliedColor, getAppliedFontScale, getAppliedTextStyle, getCurrentActiveOverlay, getModuleInfo, getModulePreference, getSystemStatus, initModuleToggleListeners as initControlCenter };
 export { initSectionManagement as initSidebarSections, initSidebarMobile, isAnyModuleActive, isAnyOverlayActive, isControlCenterActive, isModuleActive, isModuleBusy };
-export { isModuleCurrentlyChanging, keyboardShortcutsEnabled, logModuleStates, logSectionStates, onModuleActivated, onModuleDeactivated, onOverlayChanged, resetModuleChangeFlag, setModulePreference, showControlCenterMenu, showSpecificOverlay, switchControlCenterMenu, switchOverlay, switchToSection, toggleModuleByName as toggleModule, toggleTimeFormat, use24HourFormat, waitForModuleReady };
+export { isModuleCurrentlyChanging, keyboardShortcutsEnabled, logModuleStates, logSectionStates, onModuleActivated, onModuleDeactivated, onOverlayChanged, resetModuleChangeFlag, setModulePreference, showControlCenterMenu, showSpecificOverlay, switchControlCenterMenu, switchOverlay, switchToSection, toggleModuleByName as toggleModule, toggleTimeFormat, use24HourFormat, waitForModuleReady, rememberExpandedSectionsOnNav };
