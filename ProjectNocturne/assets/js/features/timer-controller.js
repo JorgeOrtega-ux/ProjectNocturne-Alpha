@@ -1077,6 +1077,7 @@ function renderAllTimerCards() {
     initializeTimerSortable();
 
 }
+// Reemplaza esta función en /assets/js/features/timer-controller.js
 function updateMainDisplay() {
     const mainDisplay = document.querySelector('.tool-timer span');
     if (!mainDisplay) return;
@@ -1084,9 +1085,9 @@ function updateMainDisplay() {
     const pinnedTimer = findTimerById(pinnedTimerId);
     if (pinnedTimer) {
         mainDisplay.textContent = formatTime(pinnedTimer.remaining, pinnedTimer.type);
-        // --- LLAMADA A LA FUNCIÓN DE AJUSTE ---
+        // Le pedimos al gestor que verifique y ajuste si es necesario
         if (window.centralizedFontManager) {
-            window.centralizedFontManager.ensureTextFits('timer');
+            window.centralizedFontManager.adjustAndApplyFontSizeToSection('timer');
         }
     } else {
         mainDisplay.textContent = formatTime(0, 'countdown');
