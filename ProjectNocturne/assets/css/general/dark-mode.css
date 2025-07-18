@@ -169,6 +169,39 @@
 
 .dark-mode .menu-button:hover {
     background-color: #ffffff20;
+}/* Dark Mode Overrides */
+.dark-mode .section-legal-content h1 {
+    border-bottom-color: #ffffff20;
+    color: #ffffffe6;
+}
+
+.dark-mode .section-legal-content h2 {
+    border-bottom-color: #ffffff20;
+    color: #ffffffe6;
+}
+
+.dark-mode .section-legal-content p {
+    color: #ffffffe6;
+}
+
+.dark-mode .section-legal-content ul {
+    color: #ffffffe6;
+}
+
+.dark-mode .section-legal-content .legal-link {
+    color: #58a6ff;
+}.dark-mode .custom-text-content {
+    border-color: #ffffff20;
+}.dark-mode .tool-card-placeholder {
+    border: 1px dashed #ffffff20;
+}/* Versión para el modo oscuro */
+.dark-mode .menu-link-actions-wrapper {
+    background-color: #3a3b3d;
+    /* Fondo oscuro para el wrapper */
+}
+
+.dark-mode .menu-link-actions-wrapper .interactive-icon:hover {
+    background-color: #ffffff20;
 }
 
 .dark-mode .ringing-card-icon {

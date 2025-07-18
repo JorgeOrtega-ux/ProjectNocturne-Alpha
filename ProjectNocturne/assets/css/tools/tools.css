@@ -45,11 +45,6 @@
     border-color: #d32f2f;
 }
 
-.menu-button .spinning {
-    color: inherit;
-    /* The color will be inherited from the button itself */
-}
-
 
 /* ====================================== */
 /* ORIGINAL STYLES (UNCHANGED)            */
@@ -273,16 +268,6 @@
     background-color: #f5f5fa;
 }
 
-/* Versión para el modo oscuro */
-.dark-mode .menu-link-actions-wrapper {
-    background-color: #3a3b3d;
-    /* Fondo oscuro para el wrapper */
-}
-
-.dark-mode .menu-link-actions-wrapper .interactive-icon:hover {
-    background-color: #ffffff20;
-}
-
 .menu-action-button {
     display: flex;
     flex: 0 0 auto;
@@ -468,10 +453,6 @@
     display: grid;
 }
 
-.worldclock-search-results-wrapper {
-    padding: 8px;
-}
-
 .tool-card {
     position: relative;
     display: flex;
@@ -488,7 +469,7 @@
 .tool-card.timer-finished .card-footer,
 .tool-card.alarm-disabled .card-header,
 .tool-card.alarm-disabled .card-footer {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .tool-card.timer-finished .card-menu-container,
@@ -550,24 +531,6 @@
     color: rgba(0, 0, 0, 0.7);
     background-color: transparent;
     border-radius: 29px;
-}
-
-.tool-card .card-pin-btn,
-.tool-card .card-menu-btn,
-.menu-link .card-pin-btn {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    color: #000000;
-    background-color: transparent;
-    border-radius: 8px;
-    border: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    cursor: pointer;
 }
 
 .menu-link .card-menu-container {
@@ -725,23 +688,6 @@
     user-select: none;
 }
 
-.alarm-search-results-wrapper,
-.timer-search-results-wrapper {
-    padding: 8px;
-}
-
-.alarm-search-results-wrapper.disabled,
-.timer-search-results-wrapper.disabled {
-    display: none;
-}
-
-.alarm-search-results-wrapper .menu-list,
-.timer-search-results-wrapper .menu-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
 .search-result-item {
     position: relative;
     display: flex;
@@ -751,32 +697,6 @@
     border-radius: 8px;
     border: 1px solid #00000020;
     transition: background-color 0.2s ease;
-}
-
-.search-result-item .card-pin-btn,
-.search-result-item .card-menu-btn {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    color: #000000;
-    background-color: transparent;
-    border-radius: 8px;
-    border: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    cursor: pointer;
-}
-
-.search-result-item .card-pin-btn.active {
-    background-color: #f5f5fa;
-}
-
-.search-result-item .card-pin-btn:hover,
-.search-result-item .card-menu-btn:hover {
-    background-color: #f5f5fa;
 }
 
 .search-result-item .result-info {
@@ -808,12 +728,6 @@
     text-align: center;
     overflow-wrap: break-word;
     color: #888;
-}
-
-.menu-alarm .menu-section-center.disabled,
-.menu-alarm .menu-section-bottom.disabled,
-.menu-timer .timer-creation-wrapper.disabled {
-    display: none;
 }
 
 .alarms-container,
@@ -924,7 +838,6 @@
     box-shadow: none;
 }
 
-/* ... existing css ... */
 /* ====================================== */
 /* ========= SIMPLE NOTIFICATION ======== */
 /* ====================================== */
@@ -990,406 +903,8 @@
     color: #ffffff;
 }
 
-/* NEW RINGING CARD STYLES */
-.module-ringing-screen {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: auto;
-    z-index: 10001;
-    display: none;
-    /* Cambiado a none */
-}
-
-.module-ringing-screen.active {
-    display: flex;
-    /* Cambiado a flex */
-}
 
 
-.module-ringing-screen.disabled {
-    display: none;
-}
-
-/* ====================================== */
-/* ====== RINGING GROUP STYLES ========== */
-/* ====================================== */
-.module-ringing-screen {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-.ringing-group {
-    width: 100%;
-    overflow: hidden;
-    color: #000000;
-    background-color: transparent;
-}
-
-.menu-ringing {
-    width: 365px;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1px solid transparent;
-    filter: drop-shadow(0 4px 12px #00000020);
-}
-
-.dark-mode .menu-ringing {
-    background: #252627;
-    color: #ffffff;
-    filter: none;
-    border-color: #ffffff20;
-}
-
-/* --- ESTILOS MEJORADOS PARA EL BOTÓN DE NOTIFICACIÓN --- */
-
-.ringing-item-actions {
-    position: relative;
-    /* Necesario para posicionar el menú desplegable */
-}
-
-.split-button-container {
-    display: inline-flex;
-    vertical-align: middle;
-    border-radius: 50px;
-    /* Hace que el contenedor completo sea redondeado */
-    overflow: hidden;
-    /* Asegura que los bordes de los botones no se salgan */
-    border: 1px solid #00000020;
-    transition: background-color 0.2s ease;
-}
-
-/* El botón principal (Descartar) ahora es más compacto */
-.split-button-container .main-action {
-    padding: 6px 12px;
-    /* Padding reducido para un botón más pequeño */
-    font-size: 13px;
-    /* Tamaño de fuente ligeramente más pequeño */
-    border: none;
-    /* Quitamos el borde individual */
-}
-
-/* El gatillo del menú desplegable (flecha) */
-.split-button-container .dropdown-trigger {
-    padding: 6px 6px;
-    border: none;
-    color: #fff;
-    background: #000;
-    border-left: 1px solid #ffffff;
-}
-
-.split-button-container .dropdown-trigger .material-symbols-rounded {
-    font-size: 20px;
-    /* Icono más pequeño */
-    transition: transform 0.2s ease-in-out;
-}
-
-/* Menú desplegable */
-.dropdown-menu-ringing {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    /* Más espacio desde el botón */
-    right: 0;
-    width: 140px;
-    /* Un poco más estrecho */
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 4px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-    z-index: 10;
-    border: 1px solid #00000020;
-}
-
-.dropdown-menu-ringing.disabled {
-    display: none;
-}
-
-.dropdown-menu-ringing .menu-link {
-    display: flex;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.dropdown-menu-ringing .menu-link:hover {
-    background-color: #f5f5fa;
-}
-
-/* --- MODO OSCURO --- */
-.dark-mode .split-button-container {
-    border-color: #ffffff20;
-}
-
-.dark-mode .split-button-container .dropdown-trigger {
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .dropdown-menu-ringing {
-    background-color: #3a3b3d;
-    border-color: #ffffff20;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .dropdown-menu-ringing .menu-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.ringing-group-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-}
-
-@media (max-width: 468px) {
-    .ringing-group-header {
-        padding-top: 0px;
-    }
-}
-
-.ringing-group-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-}
-
-.ringing-group-header-right {
-    display: flex;
-}
-
-
-.ringing-group-toggle {
-    background: none;
-    border: none;
-    color: #000000;
-    cursor: pointer;
-    flex: 0 0 auto;
-    width: 35px;
-    height: 35px;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-}
-
-.ringing-group-toggle:hover {
-    background-color: #f5f5fa;
-}
-
-.dark-mode .ringing-group-toggle:hover {
-    background-color: #ffffff20;
-}
-
-.dark-mode .ringing-group-toggle {
-    color: #fff;
-}
-
-@media (max-width: 468px) {
-    .ringing-group-toggle {
-        display: none;
-    }
-}
-
-.ringing-group.collapsed .ringing-group-toggle .material-symbols-rounded {
-    transform: rotate(180deg);
-}
-
-.ringing-group-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.ringing-group.collapsed .ringing-group-list {
-    max-height: 0;
-}
-
-.ringing-list-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-bottom: 1px solid #00000020;
-}
-
-.ringing-list-item:last-child {
-    border-bottom: none;
-}
-
-.dark-mode .ringing-list-item {
-    border-bottom-color: #ffffff20;
-}
-
-.ringing-item-icon {
-    height: 40px;
-    flex-shrink: 0;
-    display: flex;
-    text-align: center;
-    border-radius: 8px;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    background: transparent;
-    border: 1px solid #00000020;
-}
-
-.ringing-item-details {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.ringing-item-title {
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ringing-item-sound {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-
-.ringing-item-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-
-.ringing-screen-background {
-    display: none;
-}
-
-.ringing-card {
-    background: #ffffff;
-    border-radius: 12px;
-    width: 365px;
-    padding: 16px;
-    filter: drop-shadow(0 4px 12px #00000020);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    color: #000000;
-}
-
-.ringing-card-body {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-}
-
-.ringing-card-icon {
-    display: flex;
-    width: 40px;
-    border-radius: 8px;
-    height: 40px;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    background: #f5f5fa;
-}
-
-.ringing-card-content {
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.ringing-card-content .ringing-title,
-.ringing-card-content .ringing-sound {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.dark-mode .ringing-card {
-    background: #252627;
-    border-color: #ffffff20;
-    color: #ffffff;
-}
-
-.ringing-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.ringing-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-    line-height: 1.3;
-}
-
-.ringing-sound {
-    font-size: 0.875rem;
-    opacity: 0.7;
-    margin: 0;
-}
-
-.ringing-card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.ringing-button {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #00000020;
-    font-size: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: transparent;
-    transition: background-color 0.2s ease;
-    text-align: center;
-}
-
-.dark-mode .ringing-button {
-    border-color: #ffffff20;
-    color: #fff;
-}
-
-.ringing-button.snooze-button {
-    background-color: transparent;
-    color: inherit;
-}
-
-.dark-mode .ringing-button.snooze-button:hover {
-    background-color: #ffffff20;
-}
-
-.light-mode .ringing-button.snooze-button:hover {
-    background-color: #f5f5fa;
-}
-
-.ringing-button.dismiss-button {
-    background-color: #000000;
-    color: #ffffff;
-    border-color: #000000;
-}
-
-.dark-mode .ringing-button.dismiss-button {
-    background-color: #ffffff20;
-    color: #fff;
-    border-color: #ffffff20;
-}
-
-.dark-mode .tool-card-placeholder {
-    border: 1px dashed #ffffff20;
-}
 
 .island-content-wrapper {
     display: flex;
@@ -1500,221 +1015,6 @@
     display: flex;
     flex-direction: row;
     gap: 8px;
-}
-
-.dynamic-island {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    z-index: 10000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 44px;
-    height: 44px;
-    opacity: 0;
-    background: #ffffff10;
-    border-radius: 22px;
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
-    transform: translateX(-50%) translateY(-15px);
-    transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s, height 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s, border-radius 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s;
-    pointer-events: none;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.dynamic-island.active {
-    opacity: 1;
-    width: 300px;
-    height: 54px;
-    border-radius: 27px;
-    transform: translateX(-50%) translateY(0);
-    transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1), height 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-radius 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s, transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
-    pointer-events: auto;
-}
-
-.dynamic-island.active-tool-ringing {
-    width: 340px;
-}
-
-.dynamic-island.active.active-tool-ringing {
-    width: 340px;
-}
-
-.island-notification-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 12px;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    box-sizing: border-box;
-}
-
-.island-notification-content.content-visible {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 0.4s ease-in 0.2s, transform 0.4s ease-in 0.2s;
-}
-
-.dynamic-island.active-tool-ringing.small-viewport {
-    width: 320px;
-}
-
-.island-left-group {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-.island-circle {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.06);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
-    border-radius: 18px;
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-}
-
-.notification-icon-symbol {
-    font-size: 20px;
-    font-weight: 400;
-    color: #30d158;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-.notification-text-info {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 2px;
-    min-width: max-content;
-}
-
-.notification-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: #ffffff;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.notification-message {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 1.3;
-    color: rgba(255, 255, 255, 0.75);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.island-dismiss-button {
-    flex-shrink: 0;
-    margin-left: 12px;
-    padding: 6px 12px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #ffffff;
-    opacity: 0;
-    background: rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
-    border-radius: 14px;
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
-    transition: background 0.2s ease, opacity 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    pointer-events: none;
-    backdrop-filter: blur(10px);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.dynamic-island.active.active-tool-ringing .island-dismiss-button {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.island-dismiss-button:hover {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.12) 100%);
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.island-dismiss-button:active {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-    transform: scale(0.98);
-}
-
-@keyframes island-pulse {
-
-    0%,
-    100% {
-        transform: translateX(-50%) translateY(0) scale(1);
-    }
-
-    50% {
-        transform: translateX(-50%) translateY(0) scale(1.02);
-    }
-}
-
-.dynamic-island.active-tool-ringing {
-    animation: island-pulse 2s ease-in-out infinite;
-}
-
-@media (max-width: 768px) {
-    .dynamic-island {
-        top: 15px;
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-    }
-
-    .dynamic-island.active {
-        width: 280px;
-        height: 50px;
-        border-radius: 25px;
-    }
-
-    .dynamic-island.active-tool-ringing {
-        width: 320px;
-    }
-
-    .dynamic-island.active-tool-ringing.small-viewport {
-        width: 280px;
-    }
-
-    .island-circle {
-        width: 32px;
-        height: 32px;
-        border-radius: 16px;
-    }
-
-    .notification-icon-symbol {
-        font-size: 18px;
-    }
-
-    .notification-title {
-        font-size: 13px;
-    }
-
-    .notification-message {
-        font-size: 10px;
-    }
 }
 
 .everything-grid-container {
@@ -1872,36 +1172,13 @@
     font-weight: 500;
 }
 
-.dark-mode .custom-text-content {
-    border-color: #ffffff20;
-}
+
 
 .section-legal-content .legal-link:hover {
     text-decoration: underline;
 }
 
-/* Dark Mode Overrides */
-.dark-mode .section-legal-content h1 {
-    border-bottom-color: #ffffff20;
-    color: #ffffffe6;
-}
 
-.dark-mode .section-legal-content h2 {
-    border-bottom-color: #ffffff20;
-    color: #ffffffe6;
-}
-
-.dark-mode .section-legal-content p {
-    color: #ffffffe6;
-}
-
-.dark-mode .section-legal-content ul {
-    color: #ffffffe6;
-}
-
-.dark-mode .section-legal-content .legal-link {
-    color: #58a6ff;
-}
 
 .add-btn:hover {
     background-color: #f5f5fa;
@@ -1927,24 +1204,6 @@
     opacity: 0.5;
     pointer-events: none;
     cursor: not-allowed;
-}
-
-.widget-icon {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    color: #000;
-    border-radius: 12px;
-    border: 1px solid #00000020;
-}
-
-.widget-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #000000e6;
 }
 
 .clock-content {
