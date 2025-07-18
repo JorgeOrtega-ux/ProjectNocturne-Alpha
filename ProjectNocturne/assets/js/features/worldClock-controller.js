@@ -613,7 +613,7 @@ function initializeWorldClockSortable() {
         animation: 150,
         delay: 200, // Retraso para iniciar el arrastre en ms
         delayOnTouchOnly: true, // El retraso solo aplica a dispositivos táctiles
-        filter: '.card-menu-container, .local-clock-card',
+        filter: '.card-menu-container, .local-clock-card', // Previene que la tarjeta local sea arrastrada
         ghostClass: 'tool-card-placeholder',
         forceFallback: true,
         fallbackClass: 'tool-card-dragging',
@@ -626,17 +626,23 @@ function initializeWorldClockSortable() {
                 }
             }, 0);
         },
+
+        onMove: function (evt) {
+            if (evt.related.classList.contains('local-clock-card')) {
+                return false; 
+            }
+        },
         
         onEnd: function (evt) {
-            const clockId = evt.item.id;
-            const newIndex = evt.newIndex;
-            
-            const movedClockIndex = userClocks.findIndex(clock => clock.id === clockId);
-            if (movedClockIndex > -1) {
-                const [movedClock] = userClocks.splice(movedClockIndex, 1);
-                userClocks.splice(newIndex - 1, 0, movedClock);
-                saveClocksToStorage();
-            }
+            const newOrderIds = Array.from(evt.to.children)
+                                     .filter(el => !el.classList.contains('local-clock-card'))
+                                     .map(item => item.id);
+
+            userClocks.sort((a, b) => {
+                return newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id);
+            });
+
+            saveClocksToStorage();
         }
     });
 }

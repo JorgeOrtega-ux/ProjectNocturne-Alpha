@@ -236,6 +236,12 @@ function cleanupAllTooltips() {
 }
 
 function showTooltip(element) {
+    // Si la pantalla es de tamaño móvil, no se muestra el tooltip.
+    if (window.innerWidth <= 468) {
+        hideTooltip(); // Se asegura de ocultar cualquier tooltip que haya quedado visible.
+        return;
+    }
+    
     if (!enabled || !popperLoaded || !element) return;
     const tooltipText = getTooltipText(element);
     if (!tooltipText || tooltipText.trim() === '') {
