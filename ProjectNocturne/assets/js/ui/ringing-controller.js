@@ -1,5 +1,6 @@
+// jorgeortega-ux/projectnocturne-alpha/ProjectNocturne-Alpha-26af6d6a92240876cabfeecbd77228e34952e560/ProjectNocturne/assets/js/ui/ringing-controller.js
 import { getTranslation } from '../core/translations-controller.js';
-import { playSound, stopSound } from '../features/general-tools.js';
+import { playSound, stopSound, isSoundPlaying } from '../features/general-tools.js';
 import { activateModule, deactivateModule, isModuleActive, showSpecificOverlay, toggleModule } from '../app/main.js';
 
 let timeAgoIntervals = {};
@@ -43,6 +44,23 @@ function initializeRingingController() {
         if (e.detail.module === 'toggleNotificationsOverlay' || e.detail.module === 'overlayContainer') {
             updateRestoreButton();
             clearAllRingingIntervals();
+
+            const latestTool = getLatestRingingTool();
+            if (latestTool) {
+                const ringingTools = Object.values(window.ringingState.tools || {});
+                ringingTools.forEach(tool => {
+                    if (tool.toolId !== latestTool.toolId) {
+                        stopSound(tool.toolId);
+                    }
+                });
+
+                if (!isSoundPlaying(latestTool.toolId)) {
+                    playSound(latestTool.sound, latestTool.toolId);
+                }
+            } else {
+                const ringingTools = Object.values(window.ringingState.tools || {});
+                ringingTools.forEach(tool => stopSound(tool.toolId));
+            }
         }
     });
 
@@ -141,7 +159,7 @@ function showDetailView(toolId) {
     });
 
     const toolData = window.ringingState.tools[toolId];
-    if (toolData && toolData.sound) {
+    if (toolData && toolData.sound && !isSoundPlaying(toolId)) {
         playSound(toolData.sound, toolId);
     }
     

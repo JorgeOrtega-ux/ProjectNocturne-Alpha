@@ -1415,34 +1415,29 @@
     gap: 8px;
 }
 
-/* Estilo para el indicador AM/PM en los relojes */
-/* Estilo para el indicador AM/PM en los relojes */
-.ampm {
+/* assets/css/tools/tools.css (Corregido) */
+
+/* Aplica el estilo AM/PM pequeño solo a los relojes de las herramientas principales */
+.tool-alarm .ampm,
+.tool-timer .ampm,
+.tool-worldClock .ampm {
     font-size: 0.4em;
     font-weight: 500;
     margin-left: 0.2em;
-    padding-bottom: 0.1em;
-    /* --- Optimizaciones de Renderizado para Evitar Parpadeo --- */
     display: inline-block;
-    /* Requerido para que 'transform' funcione correctamente */
     -webkit-backface-visibility: hidden;
-    /* Ayuda a prevenir parpadeos en navegadores WebKit */
     backface-visibility: hidden;
     transform: translateZ(0);
-    /* Fuerza la aceleración por hardware y estabiliza el renderizado */
 }
 
-/* Estilo para los segundos fraccionales en el cronómetro */
-.fractional-seconds {
+/* Aplica el estilo de segundos fraccionales pequeños solo al cronómetro principal */
+.tool-stopwatch .fractional-seconds {
     font-size: 0.4em;
-    /* Hacemos la fuente un 40% más pequeña */
     font-weight: 500;
 }
 
-/* Resetea el estilo de los segundos fraccionales solo dentro de la tabla de vueltas */
+/* Restablece el estilo dentro de la tabla de vueltas (esta regla ya es correcta) */
 .laps-table .fractional-seconds {
     font-size: inherit;
-    /* Hereda el tamaño de la celda de la tabla, volviendo a la normalidad */
     font-weight: inherit;
-    /* Hereda el grosor normal del texto */
 }

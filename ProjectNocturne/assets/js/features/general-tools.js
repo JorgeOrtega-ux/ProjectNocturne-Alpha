@@ -1,3 +1,4 @@
+// jorgeortega-ux/projectnocturne-alpha/ProjectNocturne-Alpha-26af6d6a92240876cabfeecbd77228e34952e560/ProjectNocturne/assets/js/features/general-tools.js
 import { getTranslation } from '../core/translations-controller.js';
 import { showModal } from '../ui/menu-interactions.js';
 import { showDynamicIslandNotification } from '../ui/notification-controller.js';
@@ -228,6 +229,10 @@ function initializeAudioContext() {
         }
     }
     return true;
+}
+
+function isSoundPlaying(toolId = 'global') {
+    return activeSounds.has(toolId);
 }
 
 async function playSound(soundId, toolId = 'global') {
@@ -1641,5 +1646,6 @@ export {
     createToolCard,
     deleteUserAudio,
     getSoundNameById,
-    getAvailableSounds
+    getAvailableSounds,
+    isSoundPlaying
 };
