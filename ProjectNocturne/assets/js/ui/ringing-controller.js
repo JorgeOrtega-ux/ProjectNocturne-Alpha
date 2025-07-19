@@ -3,49 +3,12 @@ import { playSound, stopSound } from '../features/general-tools.js';
 import { activateModule, deactivateModule, isModuleActive, showSpecificOverlay, toggleModule } from '../app/main.js';
 
 let timeAgoIntervals = {};
-let blinkingTitleInterval = null; // Controlador central para el parpadeo del título
+let blinkingTitleInterval = null;
 
 // Limpia todos los intervalos de tiempo transcurrido.
 function clearAllRingingIntervals() {
     Object.values(timeAgoIntervals).forEach(clearInterval);
     timeAgoIntervals = {};
-}
-
-// NUEVA FUNCIÓN: Actualiza el título parpadeante
-function updateBlinkingTitle() {
-    if (blinkingTitleInterval) {
-        clearInterval(blinkingTitleInterval);
-        blinkingTitleInterval = null;
-    }
-
-    const latestTool = getLatestRingingTool();
-    if (!latestTool) {
-        // Si no hay herramientas sonando, restaura el título de la sección actual
-        if (window.titleManager && typeof window.titleManager.updateTitleForCurrentSection === 'function') {
-            window.titleManager.updateTitleForCurrentSection();
-        }
-        return;
-    }
-
-    const originalTitle = `ProjectNocturne - ${getTranslation(latestTool.toolType, 'tooltips')}`;
-    let isTitleVisible = true;
-    let titleText = '';
-
-    if (latestTool.toolType === 'alarm') {
-        const alarmTime = window.alarmManager.formatTimeForTitle(latestTool.hour, latestTool.minute);
-        titleText = `ProjectNocturne - ${alarmTime}`;
-    } else { // timer
-        const remainingTime = window.timerManager.formatTime(0, latestTool.type);
-        titleText = `ProjectNocturne - ${remainingTime}`;
-    }
-
-    const blink = () => {
-        document.title = isTitleVisible ? titleText : originalTitle;
-        isTitleVisible = !isTitleVisible;
-    };
-
-    blink(); // Muestra el título inmediatamente
-    blinkingTitleInterval = setInterval(blink, 1000);
 }
 
 function formatDetailedTimeSince(timestamp) {
@@ -165,7 +128,6 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
     }
     playSound(data.sound, toolId);
     updateRestoreButton();
-    updateBlinkingTitle();
 }
 
 function showDetailView(toolId) {
@@ -395,7 +357,6 @@ function hideRingingScreen(toolId) {
     }
 
     updateRestoreButton();
-    updateBlinkingTitle();
 }
 
 window.isAnyToolRinging = () => Object.keys(window.ringingState.tools).length > 0;
