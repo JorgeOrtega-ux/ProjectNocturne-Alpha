@@ -1222,7 +1222,25 @@
     font-weight: 700;
     color: #000000e6;
 }
+/* ====================================== */
+/* ====== BLINKING BUTTON ANIMATION ===== */
+/* ====================================== */
+/* ====================================== */
+/* ====== RINGING BUTTON STATE ===== */
+/* ====================================== */
 
+.header-button.is-ringing {
+    background-color: #000000;
+    border-color: #000000;
+    color: #ffffff;
+}/* ====================================== */
+/* == RINGING BUTTON STATE (DARK) == */
+/* ====================================== */
+
+.dark-mode .header-button.is-ringing {
+    background-color: #ffffff20;
+    border-color: #ffffff20;
+}
 .clock-date {
     width: max-content;
     font-size: 1.2rem;

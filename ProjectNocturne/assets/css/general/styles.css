@@ -47,9 +47,12 @@ body {
     -webkit-text-fill-color: unset;
     white-space: nowrap;
     /* --- LÍNEAS AÑADIDAS/MODIFICADAS --- */
-    display: inline-flex;      /* Activa el modo Flexbox */
-    align-items: baseline;    /* ¡La clave! Alinea el texto en su base */
-    line-height: 1;           /* Normaliza la altura de la línea */
+    display: inline-flex;
+    /* Activa el modo Flexbox */
+    align-items: baseline;
+    /* ¡La clave! Alinea el texto en su base */
+    line-height: 1;
+    /* Normaliza la altura de la línea */
 }
 
 /* ====================================== */
@@ -616,7 +619,7 @@ body {
 
 .color-wrapper {
     display: grid;
-   grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     width: 100%;
     gap: 8px;
 }
@@ -1263,7 +1266,7 @@ body {
     .menu-feedback,
     .menu-feedback-types,
     .menu-notifications {
-        height: auto;
+        height: 100%;
         max-height: 85%;
         min-height: 85%;
         border-bottom: 0;
@@ -1459,4 +1462,5 @@ body {
 .search-result-item.timer-finished .result-info {
     opacity: 0.5;
 }
+
 /* --- FIN DE ESTILOS MODIFICADOS --- */

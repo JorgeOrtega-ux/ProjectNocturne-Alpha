@@ -48,8 +48,6 @@ function updateBlinkingTitle() {
     blinkingTitleInterval = setInterval(blink, 1000);
 }
 
-// ... (resto de las funciones como formatDetailedTimeSince)
-
 function formatDetailedTimeSince(timestamp) {
     const totalSeconds = Math.floor((Date.now() - timestamp) / 1000);
     if (totalSeconds < 0) return `0 ${getTranslation('seconds', 'timer')}`;
@@ -128,11 +126,14 @@ function updateRestoreButton() {
     if (buttonElement) {
         if (ringingToolsCount > 0) {
             buttonElement.classList.remove('disabled');
+            buttonElement.classList.add('is-ringing'); // Añade la clase para la animación
         } else {
             buttonElement.classList.add('disabled');
+            buttonElement.classList.remove('is-ringing'); // Remueve la clase para detener la animación
         }
     }
 }
+
 
 function getLatestRingingTool() {
     const ringingTools = Object.values(window.ringingState.tools || {});
@@ -164,10 +165,9 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
     }
     playSound(data.sound, toolId);
     updateRestoreButton();
-    updateBlinkingTitle(); // MODIFICADO: Llamada a la función central
+    updateBlinkingTitle();
 }
 
-// ... (resto del código de showDetailView, showListView, etc. sin cambios)
 function showDetailView(toolId) {
     const menu = document.querySelector('.menu-notifications');
     if (!menu) return;
@@ -395,10 +395,9 @@ function hideRingingScreen(toolId) {
     }
 
     updateRestoreButton();
-    updateBlinkingTitle(); // MODIFICADO: Llamada a la función central
+    updateBlinkingTitle();
 }
 
-// NUEVA FUNCIÓN: Exporta una función para verificar si hay herramientas sonando
 window.isAnyToolRinging = () => Object.keys(window.ringingState.tools).length > 0;
 
 export { showRingingScreen, hideRingingScreen, initializeRingingController };
