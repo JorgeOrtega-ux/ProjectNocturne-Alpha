@@ -390,7 +390,7 @@ function resetTimer(timerId) {
     timer.isRunning = false;
     if (activeTimers.has(timerId)) {
         cancelAnimationFrame(activeTimers.get(timerId));
-        activeTimers.delete(timer.id);
+        activeTimers.delete(timerId);
     }
 
     clearRangAtTag(timerId);
@@ -702,51 +702,42 @@ function createTimerSearchResultItem(timer) {
     item.id = `search-timer-${timer.id}`;
     item.dataset.id = timer.id;
     item.dataset.type = 'timer';
-
     item.classList.toggle('timer-finished', !timer.isRunning && timer.remaining <= 0 && !timer.rangAt);
-
     const translatedTitle = timer.id.startsWith('default-timer-') ? getTranslation(timer.title, 'timer') : timer.title;
     const time = formatTime(timer.remaining, timer.type);
     const controlsState = getTimerControlsState(timer);
-
+    const isRinging = isAnyTimerRinging();
     let dynamicActionsHTML = '';
     if (controlsState.showPlayPause || controlsState.showReset) {
-        const startPauseDisabled = controlsState.isRunning ?
-            (controlsState.pauseDisabled ? 'disabled-interactive' : '') :
-            (controlsState.startDisabled ? 'disabled-interactive' : '');
-
+        const startPauseDisabled = (controlsState.isRunning ? controlsState.pauseDisabled : controlsState.startDisabled) || isRinging;
         const playPauseAction = controlsState.showPlayPause ? `
-            <div class="menu-link ${startPauseDisabled}" data-action="${controlsState.playPauseAction}">
+            <div class="menu-link ${startPauseDisabled ? 'disabled-interactive' : ''}" data-action="${controlsState.playPauseAction}">
                 <div class="menu-link-icon"><span class="material-symbols-rounded">${controlsState.playPauseIcon}</span></div>
                 <div class="menu-link-text"><span>${getTranslation(controlsState.playPauseTextKey, 'tooltips')}</span></div>
             </div>` : '';
-
         const resetAction = controlsState.showReset ? `
-            <div class="menu-link ${controlsState.resetDisabled ? 'disabled-interactive' : ''}" data-action="reset-card-timer">
+            <div class="menu-link ${(controlsState.resetDisabled || isRinging) ? 'disabled-interactive' : ''}" data-action="reset-card-timer">
                 <div class="menu-link-icon"><span class="material-symbols-rounded">refresh</span></div>
                 <div class="menu-link-text"><span>${getTranslation('reset', 'tooltips')}</span></div>
             </div>` : '';
-
         dynamicActionsHTML = playPauseAction + resetAction;
     }
-
     const deleteLinkHtml = timer.id.startsWith('default-timer-') ? '' : `
-        <div class="menu-link ${controlsState.deleteDisabled ? 'disabled-interactive' : ''}" data-action="delete-timer">
+        <div class="menu-link ${(controlsState.deleteDisabled || isRinging) ? 'disabled-interactive' : ''}" data-action="delete-timer">
             <div class="menu-link-icon"><span class="material-symbols-rounded">delete</span></div>
             <div class="menu-link-text"><span>${getTranslation('delete_timer', 'timer')}</span></div>
         </div>
     `;
-
     item.innerHTML = `
         <div class="result-info">
             <span class="result-title">${translatedTitle}</span>
             <span class="result-time">${time}</span>
         </div>
         <div class="card-menu-container disabled"> 
-             <button class="card-action-btn ${timer.isPinned ? 'active' : ''}" data-action="pin-timer" data-translate="pin_timer" data-translate-category="tooltips" data-translate-target="tooltip">
+             <button class="card-action-btn ${timer.isPinned ? 'active' : ''} ${isRinging ? 'disabled-interactive' : ''}" data-action="pin-timer" data-translate="pin_timer" data-translate-category="tooltips" data-translate-target="tooltip">
                  <span class="material-symbols-rounded">push_pin</span>
              </button>
-             <button class="card-action-btn" data-action="toggle-item-menu"
+             <button class="card-action-btn ${isRinging ? 'disabled-interactive' : ''}" data-action="toggle-item-menu"
                      data-translate="timer_options"
                      data-translate-category="timer"
                      data-translate-target="tooltip">
@@ -754,7 +745,7 @@ function createTimerSearchResultItem(timer) {
              </button>
              <div class="card-dropdown-menu body-title disabled">
                  ${dynamicActionsHTML}
-                 <div class="menu-link ${controlsState.editDisabled ? 'disabled-interactive' : ''}" data-action="edit-timer">
+                 <div class="menu-link ${(controlsState.editDisabled || isRinging) ? 'disabled-interactive' : ''}" data-action="edit-timer">
                      <div class="menu-link-icon"><span class="material-symbols-rounded">edit</span></div>
                      <div class="menu-link-text"><span>${getTranslation('edit_timer', 'timer')}</span></div>
                  </div>
@@ -1034,7 +1025,10 @@ function formatTime(ms, type = 'countdown') {
 }
 
 function addTimerAndRender(timerData, sectionId = 'user') {
-    if (isAnyTimerRinging()) return;
+    if (isAnyTimerRinging()) {
+        showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+        return;
+    }
     const newTimer = {
         id: `timer-${Date.now()}`,
         title: timerData.title,
@@ -1514,7 +1508,6 @@ function initializeTimerController() {
     const section = document.querySelector('.section-timer');
     if (!section) return;
 
-    // --- INICIO DE LA MODIFICACIÓN ---
     const addTimerBtn = section.querySelector('[data-module="toggleMenuTimer"]');
     if (addTimerBtn) {
         addTimerBtn.addEventListener('click', (e) => {
@@ -1523,9 +1516,22 @@ function initializeTimerController() {
                 e.stopPropagation();
                 showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
             }
-        }, true); // Usar fase de captura
+        }, true);
     }
-    // --- FIN DE LA MODIFICACIÓN ---
+    
+    const menuElement = document.querySelector('.menu-timer[data-menu="timer"]');
+    if (menuElement) {
+        const createButton = menuElement.querySelector('[data-action="createTimer"]');
+        if (createButton) {
+            createButton.addEventListener('click', (e) => {
+                if (isAnyTimerRinging()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                }
+            });
+        }
+    }
 
     const startBtn = section.querySelector('[data-action="start-pinned-timer"]');
     const pauseBtn = section.querySelector('[data-action="pause-pinned-timer"]');

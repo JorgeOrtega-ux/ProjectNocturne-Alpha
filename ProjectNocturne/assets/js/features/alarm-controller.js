@@ -573,20 +573,16 @@ function createSearchResultItem(alarm) {
     item.id = `search-alarm-${alarm.id}`;
     item.dataset.id = alarm.id;
     item.dataset.type = 'alarm';
-
     item.classList.toggle('alarm-disabled', !alarm.enabled);
-
     const translatedTitle = alarm.type === 'default' ? getTranslation(alarm.title, 'alarms') : alarm.title;
     const time = formatTime(alarm.hour, alarm.minute);
-    const controlsState = getAlarmControlsState(alarm);
-
+    const isRinging = isAnyAlarmRinging();
     const deleteLinkHtml = alarm.type === 'default' ? '' : `
-        <div class="menu-link ${controlsState.deleteDisabled ? 'disabled-interactive' : ''}" data-action="delete-alarm">
+        <div class="menu-link ${isRinging ? 'disabled-interactive' : ''}" data-action="delete-alarm">
             <div class="menu-link-icon"><span class="material-symbols-rounded">delete</span></div>
             <div class="menu-link-text"><span data-translate="delete_alarm" data-translate-category="alarms">${getTranslation('delete_alarm', 'alarms')}</span></div>
         </div>
     `;
-
     item.innerHTML = `
         <div class="result-info">
             <span class="result-title">${translatedTitle}</span>
@@ -600,15 +596,15 @@ function createSearchResultItem(alarm) {
                 <span class="material-symbols-rounded">more_horiz</span>
             </button>
             <div class="card-dropdown-menu disabled body-title">
-                 <div class="menu-link ${controlsState.toggleDisabled ? 'disabled-interactive' : ''}" data-action="toggle-alarm">
+                 <div class="menu-link ${isRinging ? 'disabled-interactive' : ''}" data-action="toggle-alarm">
                      <div class="menu-link-icon"><span class="material-symbols-rounded">${alarm.enabled ? 'toggle_on' : 'toggle_off'}</span></div>
                      <div class="menu-link-text"><span data-translate="${alarm.enabled ? 'deactivate_alarm' : 'activate_alarm'}" data-translate-category="alarms">${getTranslation(alarm.enabled ? 'deactivate_alarm' : 'activate_alarm', 'alarms')}</span></div>
                  </div>
-                 <div class="menu-link ${controlsState.testDisabled ? 'disabled-interactive' : ''}" data-action="test-alarm">
+                 <div class="menu-link ${isRinging ? 'disabled-interactive' : ''}" data-action="test-alarm">
                      <div class="menu-link-icon"><span class="material-symbols-rounded">volume_up</span></div>
                      <div class="menu-link-text"><span data-translate="test_alarm" data-translate-category="alarms">${getTranslation('test_alarm', 'alarms')}</span></div>
                  </div>
-                 <div class="menu-link ${controlsState.editDisabled ? 'disabled-interactive' : ''}" data-action="edit-alarm">
+                 <div class="menu-link ${isRinging ? 'disabled-interactive' : ''}" data-action="edit-alarm">
                      <div class="menu-link-icon"><span class="material-symbols-rounded">edit</span></div>
                      <div class="menu-link-text"><span data-translate="edit_alarm" data-translate-category="alarms">${getTranslation('edit_alarm', 'alarms')}</span></div>
                  </div>
@@ -720,7 +716,10 @@ function getAlarmLimit() {
 }
 
 function createAlarm(title, hour, minute, sound, sectionId = 'user') {
-    if (isAnyAlarmRinging()) return false;
+    if (isAnyAlarmRinging()) {
+        showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+        return false;
+    }
     const alarmLimit = getAlarmLimit();
     if (userAlarms.length >= alarmLimit) {
         showDynamicIslandNotification(
@@ -1175,8 +1174,10 @@ function initializeAlarmClock() {
     if (menuElement) {
         const createButton = menuElement.querySelector('[data-action="createAlarm"]');
         if (createButton) {
-            createButton.addEventListener('click', () => {
+            createButton.addEventListener('click', (e) => {
                 if (isAnyAlarmRinging()) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
                     return;
                 }
