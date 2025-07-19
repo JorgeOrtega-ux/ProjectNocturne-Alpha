@@ -496,10 +496,8 @@ function createExpandableToolContainer({ type, titleKey, translationCategory, ic
     const header = container.querySelector('.expandable-card-header');
     if (header) {
         header.addEventListener('click', (e) => {
-            // Evita que el evento se propague si se hace clic en el botón
-            if (!e.target.closest('button')) {
-                toggleFunction(type);
-            }
+            // Ahora cualquier clic en el header activará la función
+            toggleFunction(type);
         });
     }
 
@@ -711,7 +709,7 @@ function initializeCentralizedFontManager() {
             globalScaleFactor = 1.0;
         }
     }
-    
+
     function saveFontScaleToStorage() {
         localStorage.setItem(STORAGE_KEY, globalScaleFactor.toString());
     }
@@ -849,7 +847,7 @@ function initializeCentralizedFontManager() {
         element.style.fontSize = currentSize;
         return overflows;
     }
-function adjustAndApplyFontSizeToSection(sectionName) {
+    function adjustAndApplyFontSizeToSection(sectionName) {
         const container = clockContainers[sectionName];
         const element = clockElements[sectionName];
         const display = fontSizeDisplays[sectionName];
@@ -964,7 +962,7 @@ function adjustAndApplyFontSizeToSection(sectionName) {
         }
         return false;
     }
-function decreaseFontSize(sectionName) {
+    function decreaseFontSize(sectionName) {
         // Si se especifica una sección, la usamos. Si no, usamos la primera como antes.
         const targetSection = sectionName || Object.keys(clockElements)[0];
         if (targetSection) {
@@ -1051,9 +1049,9 @@ function decreaseFontSize(sectionName) {
         getCurrentActualSize: getCurrentActualFontSizePublic,
         adjustAndApplyFontSizeToAll: adjustAndApplyFontSizeToAllSections,
         adjustAndApplyFontSizeToSection: adjustAndApplyFontSizeToSection,
-        
+
         // --- FUNCIÓN NUEVA Y CLAVE ---
-        ensureTextFits: function(sectionName) {
+        ensureTextFits: function (sectionName) {
             if (!isInitialized || !sectionName) return;
 
             // Usamos requestAnimationFrame para asegurar que el DOM se haya actualizado
@@ -1077,7 +1075,7 @@ function decreaseFontSize(sectionName) {
                 fitText();
             });
         },
-        
+
         updateAllButtonStates: function () {
             sections.forEach(function updateSection(sectionName) {
                 if (clockContainers[sectionName]) {
@@ -1492,7 +1490,7 @@ function handleAlarmCardAction(action, alarmId, target) {
     // --- LÓGICA DE SEGURIDAD MEJORADA ---
     const isRinging = window.alarmManager.isAnyAlarmRinging && window.alarmManager.isAnyAlarmRinging();
     const alarm = window.alarmManager.findAlarmById(alarmId);
-    
+
     // Permitir solo la acción de descartar si esta alarma específica está sonando
     if (isRinging) {
         if (!alarm || !alarm.isRinging || action !== 'dismiss-alarm') {
