@@ -1,4 +1,4 @@
-<div class="menu-feedback disabled body-title" data-menu="feedback">
+<div class="menu-component disabled body-title" data-menu="feedback">
     <div class="pill-container">
         <div class="drag-handle"></div>
     </div>

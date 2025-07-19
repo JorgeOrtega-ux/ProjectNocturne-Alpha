@@ -1,4 +1,4 @@
-<div class="menu-create-section disabled body-title" data-menu="createSection">
+<div class="menu-component disabled body-title" data-menu="createSection">
     <div class="pill-container">
         <div class="drag-handle"></div>
     </div>

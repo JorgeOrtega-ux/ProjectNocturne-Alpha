@@ -366,7 +366,7 @@ function deactivateModuleWithAnimation(moduleName, source) {
    } else if (moduleName === 'overlayContainer') {
         const overlayContainer = domCache.overlayContainer.module;
         if (overlayContainer) {
-          activeMenu = overlayContainer.querySelector('.menu-alarm.active, .menu-timer.active, .menu-worldClock.active, .menu-paletteColors.active, .menu-sounds.active, .menu-country.active, .menu-timeZone.active, .menu-calendar.active, .menu-timePicker.active, .menu-delete.active, .menu-feedback.active, .menu-feedback-types.active, .menu-notifications.active');
+          activeMenu = overlayContainer.querySelector('.menu-component.active');
         }
     }
     if (activeMenu) {
@@ -812,7 +812,7 @@ function isModuleCurrentlyChanging() {
     const isControlCenterBusy = controlCenterModule?.classList.contains('closing') ||
         controlCenterModule?.querySelector('.menu-control-center.closing') || false;
     const isOverlayBusy = overlayContainer?.classList.contains('closing') ||
-        overlayContainer?.querySelector('.menu-alarm.closing, .menu-timer.closing, .menu-worldClock.closing, .menu-paletteColors.closing, .menu-sounds.closing') || false;
+        overlayContainer?.querySelector('.menu-component.closing') || false;
     return moduleState.isModuleChanging || isControlCenterBusy || isOverlayBusy;
 }
 

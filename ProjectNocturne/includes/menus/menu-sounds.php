@@ -1,4 +1,4 @@
-<div class="menu-sounds disabled body-title" data-menu="sounds">
+<div class="menu-component disabled body-title" data-menu="sounds">
     <div class="pill-container">
         <div class="drag-handle"></div>
     </div>
@@ -18,11 +18,14 @@
                 </div>
             </div>
         </div>
+        <div class="menu-section-extra">
+            <div id="upload-audio-wrapper" class="disabled"></div>
+        </div>
         <div class="menu-content-scrolleable">
             <div class="search-results-wrapper disabled"></div>
             <div class="creation-wrapper active">
                 <div class="menu-section-center overflow-y">
-                    <div id="upload-audio-wrapper" class="disabled"></div>
+
                     <div id="sound-list-wrapper"></div>
                 </div>
             </div>

@@ -256,7 +256,7 @@ function getModuleFromDragTarget(dragTarget) {
     if (overlayModule) {
         return {
             module: overlayModule,
-            menu: overlayModule.querySelector('.menu-alarm.active, .menu-timer.active, .menu-worldClock.active, .menu-paletteColors.active, .menu-sounds.active, .menu-country.active, .menu-timezone.active, .menu-calendar.active, .menu-timePicker.active, .menu-delete.active, .menu-feedback.active, .menu-feedback-types.active, .menu-create-section.active, .menu-notifications.active'),
+            menu: overlayModule.querySelector('.menu-component.active'),
             type: 'overlay'
         };
     }
@@ -311,7 +311,7 @@ function disableDrag() {
 }
 
 function resetAllMenuStyles() {
-    document.querySelectorAll('.menu-control-center, .menu-alarm, .menu-timer, .menu-worldClock, .menu-paletteColors, .menu-sounds, .menu-country, .menu-timezone, .menu-calendar, .menu-timePicker, .menu-ringing, .menu-notifications, .menu-delete, .menu-feedback, .menu-feedback-types, .menu-create-section')
+    document.querySelectorAll('.menu-component, .menu-control-center, .menu-ringing')
         .forEach(menu => {
             menu.classList.remove('closing', 'dragging', 'slide-out-mobile');
             menu.removeAttribute('style');

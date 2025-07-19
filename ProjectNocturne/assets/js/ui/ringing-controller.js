@@ -149,7 +149,7 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
 }
 
 function showDetailView(toolId) {
-    const menu = document.querySelector('.menu-notifications');
+    const menu = document.querySelector('.menu-component[data-menu="notifications"]');
     if (!menu) return;
 
     Object.keys(window.ringingState.tools).forEach(id => {
@@ -183,7 +183,7 @@ function showDetailView(toolId) {
 }
 
 function showListView() {
-    const menu = document.querySelector('.menu-notifications');
+    const menu = document.querySelector('.menu-component[data-menu="notifications"]');
     if (!menu) return;
 
     const listView = menu.querySelector('#ringing-list-view');

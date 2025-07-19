@@ -1,4 +1,4 @@
-<div class="menu-alarm disabled body-title" data-menu="alarm">
+<div class="menu-component disabled body-title" data-menu="alarm">
     <div class="pill-container">
         <div class="drag-handle"></div>
     </div>

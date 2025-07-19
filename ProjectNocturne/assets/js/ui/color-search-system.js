@@ -1,7 +1,7 @@
 import { attachTooltipsToNewElements } from './tooltip-controller.js';
 
 const COLOR_SEARCH_CONFIG = {
-    searchInput: '.menu-paletteColors .search-content-text input',
+    searchInput: '.menu-component[data-menu="paletteColors"] .search-content-text input',
     mainColorsWrapper: '[data-colors-wrapper="main"]',
     searchColorsWrapper: '[data-colors-wrapper="search"]',
     maxResultsPerSection: 18,

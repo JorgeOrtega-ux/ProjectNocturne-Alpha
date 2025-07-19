@@ -136,21 +136,8 @@
 /* ====================================== */
 /* ========= MODULES & OVERLAYS ========= */
 /* ====================================== */
-.dark-mode .menu-control-center,
-.dark-mode .menu-paletteColors,
-.dark-mode .menu-alarm,
-.dark-mode .menu-timer,
-.dark-mode .menu-worldClock,
-.dark-mode .menu-sounds,
-.dark-mode .menu-country,
-.dark-mode .menu-timeZone,
-.dark-mode .menu-timePicker,
-.dark-mode .menu-calendar,
-.dark-mode .menu-delete,
-.dark-mode .menu-feedback,
-.dark-mode .menu-feedback-types,
-.dark-mode .menu-create-section,
-.dark-mode .menu-notifications {
+.dark-mode .menu-component,
+.dark-mode .menu-control-center {
     color: #ffffff;
     background-color: #252627;
     border: 1px solid #ffffff20;

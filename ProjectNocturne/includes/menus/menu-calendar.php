@@ -1,4 +1,4 @@
-<div class="menu-calendar disabled body-title" data-menu="calendar">
+<div class="menu-component disabled body-title" data-menu="calendar">
     <div class="pill-container">
         <div class="drag-handle"></div>
     </div>

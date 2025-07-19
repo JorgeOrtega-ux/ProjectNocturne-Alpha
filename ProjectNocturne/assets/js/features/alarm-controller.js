@@ -524,7 +524,7 @@ function snoozeAlarm(alarmId) {
 }
 
 function renderAlarmSearchResults(searchTerm) {
-    const menuElement = document.querySelector('.menu-alarm[data-menu="alarm"]');
+    const menuElement = document.querySelector('.menu-component[data-menu="alarm"]');
     if (!menuElement) return;
 
     const resultsWrapper = menuElement.querySelector('.search-results-wrapper');
@@ -1176,7 +1176,7 @@ function initializeAlarmClock() {
         }
     }
 
-    const menuElement = document.querySelector('.menu-alarm[data-menu="alarm"]');
+    const menuElement = document.querySelector('.menu-component[data-menu="alarm"]');
     if (menuElement) {
         const createButton = menuElement.querySelector('[data-action="createAlarm"]');
         if (createButton) {

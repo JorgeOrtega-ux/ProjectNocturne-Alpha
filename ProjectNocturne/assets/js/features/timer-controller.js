@@ -651,7 +651,7 @@ function createTimerCardFromData(timer) {
 }
 
 function renderTimerSearchResults(searchTerm) {
-    const menuElement = document.querySelector('.menu-timer[data-menu="timer"]');
+    const menuElement = document.querySelector('.menu-component[data-menu="timer"]');
     if (!menuElement) return;
 
     const resultsWrapper = menuElement.querySelector('.search-results-wrapper');
@@ -1519,7 +1519,7 @@ function initializeTimerController() {
         }, true);
     }
     
-    const menuElement = document.querySelector('.menu-timer[data-menu="timer"]');
+    const menuElement = document.querySelector('.menu-component[data-menu="timer"]');
     if (menuElement) {
         const createButton = menuElement.querySelector('[data-action="createTimer"]');
         if (createButton) {
@@ -1634,7 +1634,7 @@ function initializeTimerController() {
 
     document.addEventListener('moduleDeactivated', (e) => {
         if (e.detail && e.detail.module === 'toggleMenuTimer') {
-            const menuElement = document.querySelector('.menu-timer[data-menu="timer"]');
+            const menuElement = document.querySelector('.menu-component[data-menu="timer"]');
             if (!menuElement) return;
 
             const searchInput = menuElement.querySelector('#timer-search-input');

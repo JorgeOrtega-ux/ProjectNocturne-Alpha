@@ -438,20 +438,7 @@ body {
     background-color: #f5f5fa;
 }
 
-.menu-alarm,
-.menu-timer,
-.menu-worldClock,
-.menu-paletteColors,
-.menu-sounds,
-.menu-country,
-.menu-timeZone,
-.menu-calendar,
-.menu-timePicker,
-.menu-delete,
-.menu-feedback,
-.menu-feedback-types,
-.menu-create-section,
-.menu-notifications {
+.menu-component {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -1253,19 +1240,7 @@ body {
         background-color: #00000080;
     }
 
-    .menu-alarm,
-    .menu-timer,
-    .menu-worldClock,
-    .menu-paletteColors,
-    .menu-sounds,
-    .menu-country,
-    .menu-timeZone,
-    .menu-calendar,
-    .menu-timePicker,
-    .menu-delete,
-    .menu-feedback,
-    .menu-feedback-types,
-    .menu-notifications {
+    .menu-component {
         height: 100%;
         max-height: 85%;
         min-height: 85%;

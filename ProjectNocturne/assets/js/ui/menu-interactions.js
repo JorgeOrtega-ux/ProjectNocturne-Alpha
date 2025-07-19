@@ -20,7 +20,7 @@ function generateFeedbackUUID() {
 
 
 function populateConfirmationModal(data) {
-    const modalMenu = document.querySelector('.menu-delete');
+    const modalMenu = document.querySelector('.menu-component[data-menu="delete"]');
     if (!modalMenu) return;
     const headerTitleElement = modalMenu.querySelector('[data-delete-item="header-title"]');
     const itemTypeLabelElement = modalMenu.querySelector('[data-delete-item="item-type-label"]');
@@ -43,7 +43,7 @@ function populateConfirmationModal(data) {
 }
 
 function setupModalEventListeners() {
-    const deleteMenu = document.querySelector('.menu-delete');
+    const deleteMenu = document.querySelector('.menu-component[data-menu="delete"]');
     if (!deleteMenu) return;
     const confirmBtn = deleteMenu.querySelector('.menu-button--danger');
     const cancelBtn = deleteMenu.querySelector('.menu-button:not(.menu-button--danger)');
@@ -192,7 +192,7 @@ function resetOverlayNavigation() {
     if (!overlay) return;
 
     // Se eliminaron '.menu-notifications' y '.menu-ringing-list' de la lista de selectores.
-    const subMenus = overlay.querySelectorAll('.menu-sounds, .menu-country, .menu-timeZone, .menu-calendar, .menu-timePicker, .menu-delete, .menu-feedback, .menu-feedback-types, .menu-create-section');
+    const subMenus = overlay.querySelectorAll('.menu-component[data-menu="sounds"], .menu-component[data-menu="country"], .menu-component[data-menu="timeZone"], .menu-component[data-menu="calendar"], .menu-component[data-menu="timePicker"], .menu-component[data-menu="delete"], .menu-component[data-menu="feedback"], .menu-component[data-menu="feedbackTypes"], .menu-component[data-menu="createSection"]');
 
     subMenus.forEach(subMenu => {
         subMenu.classList.remove('active');
@@ -283,20 +283,20 @@ const toggleDropdown = (action, parentMenu) => {
 
 function getMenuElement(menuName) {
     const menuSelectorMap = {
-        'menuAlarm': '.menu-alarm[data-menu="alarm"]',
-        'menuTimer': '.menu-timer[data-menu="timer"]',
-        'menuWorldClock': '.menu-worldClock[data-menu="worldClock"]',
-        'menuCalendar': '.menu-calendar[data-menu="calendar"]',
-        'timePicker': '.menu-timePicker[data-menu="timePicker"]',
-        'timeZone': '.menu-timeZone[data-menu="timeZone"]',
-        'menuFeedbackTypes': '.menu-feedback-types[data-menu="feedbackTypes"]',
-        'menuFeedback': '.menu-feedback[data-menu="feedback"]',
-        'createSection': '.menu-create-section[data-menu="createSection"]',
-        'menuPaletteColors': '.menu-paletteColors[data-menu="paletteColors"]',
-        'menuSounds': '.menu-sounds[data-menu="sounds"]',
-        'menuCountry': '.menu-country[data-menu="country"]',
-        'menuDelete': '.menu-delete[data-menu="delete"]',
-        'menuNotifications': '.menu-notifications[data-menu="notifications"]'
+        'menuAlarm': '.menu-component[data-menu="alarm"]',
+        'menuTimer': '.menu-component[data-menu="timer"]',
+        'menuWorldClock': '.menu-component[data-menu="worldClock"]',
+        'menuCalendar': '.menu-component[data-menu="calendar"]',
+        'timePicker': '.menu-component[data-menu="timePicker"]',
+        'timeZone': '.menu-component[data-menu="timeZone"]',
+        'menuFeedbackTypes': '.menu-component[data-menu="feedbackTypes"]',
+        'menuFeedback': '.menu-component[data-menu="feedback"]',
+        'createSection': '.menu-component[data-menu="createSection"]',
+        'menuPaletteColors': '.menu-component[data-menu="paletteColors"]',
+        'menuSounds': '.menu-component[data-menu="sounds"]',
+        'menuCountry': '.menu-component[data-menu="country"]',
+        'menuDelete': '.menu-component[data-menu="delete"]',
+        'menuNotifications': '.menu-component[data-menu="notifications"]'
     };
     return document.querySelector(menuSelectorMap[menuName]);
 };
@@ -955,7 +955,7 @@ async function populateTimezoneDropdown(parentMenu, countryCode) {
 }
 
 async function populateSoundsMenu(context) {
-    const soundsMenu = document.querySelector('.menu-sounds');
+    const soundsMenu = document.querySelector('.menu-component[data-menu="sounds"]');
     if (!soundsMenu) return;
     const uploadContainer = soundsMenu.querySelector('#upload-audio-wrapper');
     const listContainer = soundsMenu.querySelector('#sound-list-wrapper');
@@ -990,7 +990,7 @@ function setupGlobalEventListeners() {
     document.body.addEventListener('input', (event) => {
         const target = event.target;
         if (!['sound-search-input', 'country-search-input', 'timezone-search-input'].includes(target.id)) return;
-        const menu = target.closest('.menu-sounds, .menu-country, .menu-timeZone');
+        const menu = target.closest('.menu-component[data-menu="sounds"], .menu-component[data-menu="country"], .menu-component[data-menu="timeZone"]');
         if (!menu) return;
         const searchTerm = target.value.toLowerCase();
         const creationWrapper = menu.querySelector('.creation-wrapper');
@@ -1095,7 +1095,7 @@ function setupGlobalEventListeners() {
     });
 
     document.body.addEventListener('click', (event) => {
-        const parentMenu = event.target.closest('.menu-alarm, .menu-timer, .menu-worldClock, .menu-sounds, .menu-country, .menu-timeZone, .menu-calendar, .menu-timePicker, .menu-feedback, .menu-feedback-types, .menu-create-section');
+        const parentMenu = event.target.closest('.menu-component');
         if (!parentMenu || autoIncrementState.isActive) return;
         handleMenuClick(event, parentMenu);
     });
@@ -1113,7 +1113,7 @@ function setupGlobalEventListeners() {
     };
     Object.keys(incrementDecrementActions).forEach(action => {
         document.querySelectorAll(`[data-action="${action}"]`).forEach(button => {
-            const parentMenu = button.closest('.menu-alarm, .menu-timer');
+            const parentMenu = button.closest('.menu-component[data-menu="alarm"], .menu-component[data-menu="timer"]');
             if (!parentMenu) return;
             const actionFn = () => incrementDecrementActions[action](parentMenu);
             button.addEventListener('mousedown', () => startAutoIncrement(actionFn));
@@ -1142,7 +1142,7 @@ async function handleMenuClick(event, parentMenu) {
         const menuLink = target.closest('.menu-link');
         const sectionId = menuLink.dataset.sectionId;
         const sectionName = menuLink.dataset.sectionName;
-        const createSectionMenu = document.querySelector('.menu-create-section');
+        const createSectionMenu = document.querySelector('.menu-component[data-menu="createSection"]');
 
         createSectionMenu.setAttribute('data-editing-id', sectionId);
         createSectionMenu.querySelector('#section-name-input').value = sectionName;
@@ -1182,7 +1182,7 @@ async function handleMenuClick(event, parentMenu) {
         addSpinnerToCreateButton(saveButton);
 
         setTimeout(() => {
-            const createSectionMenu = document.querySelector('.menu-create-section');
+            const createSectionMenu = document.querySelector('.menu-component[data-menu="createSection"]');
             const sectionId = createSectionMenu.getAttribute('data-editing-id');
             const sectionNameInput = createSectionMenu.querySelector('#section-name-input');
             const newSectionName = sectionNameInput.value.trim();
@@ -1336,7 +1336,7 @@ async function handleMenuClick(event, parentMenu) {
         if (!option) return;
         const value = option.dataset.value;
         const textSpan = option.querySelector('span[data-translate]');
-        const feedbackMenu = document.querySelector('.menu-feedback');
+        const feedbackMenu = document.querySelector('.menu-component[data-menu="feedback"]');
         if (!feedbackMenu) return;
         const display = feedbackMenu.querySelector('#feedback-type-display');
         const hiddenInput = feedbackMenu.querySelector('#feedback-type-value');
@@ -1447,12 +1447,12 @@ async function handleMenuClick(event, parentMenu) {
             break;
         case 'open-country-menu':
             navigateToMenu('country');
-            populateCountryDropdown(document.querySelector('.menu-country'));
+            populateCountryDropdown(document.querySelector('.menu-component[data-menu="country"]'));
             break;
         case 'open-timezone-menu':
             if (target.classList.contains('disabled-interactive')) return;
             navigateToMenu('timeZone');
-            populateTimezoneDropdown(document.querySelector('.menu-timeZone'), state.worldClock.countryCode);
+            populateTimezoneDropdown(document.querySelector('.menu-component[data-menu="timeZone"]'), state.worldClock.countryCode);
             break;
         case 'open-sounds-menu':
             if (target.dataset.context) {
@@ -1463,7 +1463,7 @@ async function handleMenuClick(event, parentMenu) {
             }
             break;
         case 'back-to-previous-menu':
-            const createSectionMenu = parentMenu.closest('.menu-create-section');
+            const createSectionMenu = parentMenu.closest('.menu-component[data-menu="createSection"]');
             if (createSectionMenu && createSectionMenu.hasAttribute('data-editing-id')) {
                 resetCreateSectionMenu(createSectionMenu);
             } else {
@@ -1481,7 +1481,7 @@ async function handleMenuClick(event, parentMenu) {
         }
         case 'select-audio': {
             event.stopPropagation();
-            const soundsMenu = document.querySelector('.menu-sounds');
+            const soundsMenu = document.querySelector('.menu-component[data-menu="sounds"]');
             const stagedSoundLink = soundsMenu.querySelector('.menu-link[data-action="stageSound"].active');
             if (stagedSoundLink) {
                 const soundId = stagedSoundLink.dataset.soundId;
@@ -1710,7 +1710,7 @@ async function handleMenuClick(event, parentMenu) {
     }
 }
 function populateSectionsList(context) {
-    const menu = document.querySelector('.menu-create-section');
+    const menu = document.querySelector('.menu-component[data-menu="createSection"]');
     if (!menu) return;
     const listContainer = menu.querySelector('.sections-list-container');
     if (!listContainer) return;
@@ -1765,7 +1765,7 @@ function populateSectionsList(context) {
     });
 }
 function initializeFeedbackForm() {
-    const feedbackMenu = document.querySelector('.menu-feedback[data-menu="feedback"]');
+    const feedbackMenu = document.querySelector('.menu-component[data-menu="feedback"]');
     if (!feedbackMenu) return;
     const submitButton = feedbackMenu.querySelector('[data-action="submit-feedback-form"]');
     if (!submitButton) return;

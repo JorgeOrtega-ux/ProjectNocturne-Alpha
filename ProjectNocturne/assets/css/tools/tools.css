@@ -1441,3 +1441,8 @@
     font-size: inherit;
     font-weight: inherit;
 }
+
+.menu-section-extra {
+    padding: 8px;
+    border-bottom: 1px solid #00000020;
+}
