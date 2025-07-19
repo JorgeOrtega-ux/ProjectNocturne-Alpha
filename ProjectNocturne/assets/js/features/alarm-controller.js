@@ -631,6 +631,12 @@ function addSearchItemEventListeners(item) {
         const actionTarget = e.target.closest('[data-action]');
         if (!actionTarget) return;
 
+        if (isAnyAlarmRinging()) {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            e.stopPropagation();
+            return;
+        }
+
         if (actionTarget.classList.contains('disabled-interactive')) {
             e.stopPropagation();
             return;

@@ -1394,6 +1394,7 @@ function initializeCardEventListeners() {
     mainContainer.addEventListener('click', (e) => {
         const actionTarget = e.target.closest('[data-action]');
 
+        // Lógica para cerrar menús desplegables al hacer clic fuera
         if (!actionTarget || !actionTarget.closest('.card-menu-container')) {
             document.querySelectorAll('.card-dropdown-menu').forEach(menu => {
                 if (menu.popperInstance) {
@@ -1401,7 +1402,6 @@ function initializeCardEventListeners() {
                     menu.popperInstance = null;
                 }
                 menu.classList.add('disabled');
-                 // SOLUCIÓN: Añadir 'disabled' también al contenedor padre al hacer clic fuera
                 const parentContainer = menu.closest('.card-menu-container');
                 if (parentContainer) {
                     parentContainer.classList.add('disabled');
@@ -1409,10 +1409,37 @@ function initializeCardEventListeners() {
             });
         }
 
-
         if (!actionTarget) return;
 
-        const cardId = actionTarget.closest('.tool-card, .search-result-item')?.dataset.id;
+        const cardOrItem = actionTarget.closest('.tool-card, .search-result-item');
+        let cardType = null;
+        if (cardOrItem) {
+            if (cardOrItem.classList.contains('alarm-card') || cardOrItem.dataset.type === 'alarm') {
+                cardType = 'alarm';
+            } else if (cardOrItem.classList.contains('timer-card') || cardOrItem.dataset.type === 'timer') {
+                cardType = 'timer';
+            } else if (cardOrItem.classList.contains('world-clock-card') || cardOrItem.dataset.type === 'world-clock') {
+                cardType = 'world-clock';
+            }
+        }
+
+        // Lógica de seguridad centralizada
+        if (actionTarget.classList.contains('disabled-interactive')) {
+            let isRinging = false;
+            if (cardType === 'alarm' && window.alarmManager && typeof window.alarmManager.isAnyAlarmRinging === 'function') {
+                isRinging = window.alarmManager.isAnyAlarmRinging();
+            } else if (cardType === 'timer' && window.timerManager && typeof window.timerManager.isAnyTimerRinging === 'function') {
+                isRinging = window.timerManager.isAnyTimerRinging();
+            }
+
+            if (isRinging) {
+                showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            }
+            e.stopPropagation();
+            return;
+        }
+
+        const cardId = cardOrItem?.dataset.id;
         const action = actionTarget.dataset.action;
 
         if (action === 'toggle-card-menu') {
@@ -1420,16 +1447,6 @@ function initializeCardEventListeners() {
             handleCardMenuToggle(actionTarget);
             return;
         }
-
-        if (actionTarget.classList.contains('disabled-interactive')) {
-            e.stopPropagation();
-            return;
-        }
-
-        const card = actionTarget.closest('.tool-card');
-        const cardType = card?.classList.contains('alarm-card') ? 'alarm' :
-            card?.classList.contains('timer-card') ? 'timer' :
-                card?.classList.contains('world-clock-card') ? 'world-clock' : null;
 
         if (cardType && cardId) {
             switch (cardType) {

@@ -1169,6 +1169,15 @@ async function handleMenuClick(event, parentMenu) {
     }
 
     if (action === 'save-section-changes') {
+        const context = soundSelectionContext;
+        if (context === 'alarm' && window.alarmManager && window.alarmManager.isAnyAlarmRinging()) {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            return;
+        }
+        if (context === 'timer' && window.timerManager && window.timerManager.isAnyTimerRinging()) {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            return;
+        }
         const saveButton = target;
         addSpinnerToCreateButton(saveButton);
 
@@ -1177,7 +1186,6 @@ async function handleMenuClick(event, parentMenu) {
             const sectionId = createSectionMenu.getAttribute('data-editing-id');
             const sectionNameInput = createSectionMenu.querySelector('#section-name-input');
             const newSectionName = sectionNameInput.value.trim();
-            const context = soundSelectionContext;
 
             if (!newSectionName) {
                 validateField(sectionNameInput.parentElement, false);
@@ -1205,6 +1213,7 @@ async function handleMenuClick(event, parentMenu) {
         }, 500);
         return;
     }
+
 
     if (action === 'delete-section') {
         const sectionId = target.closest('.menu-link').dataset.sectionId;
@@ -1253,12 +1262,21 @@ async function handleMenuClick(event, parentMenu) {
     }
 
     if (action === 'create-section') {
+        const context = soundSelectionContext;
+        if (context === 'alarm' && window.alarmManager && window.alarmManager.isAnyAlarmRinging()) {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            return;
+        }
+        if (context === 'timer' && window.timerManager && window.timerManager.isAnyTimerRinging()) {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            return;
+        }
+
         const createButton = target;
         addSpinnerToCreateButton(createButton);
 
         const sectionNameInput = parentMenu.querySelector('#section-name-input');
         const sectionName = sectionNameInput.value.trim();
-        const context = soundSelectionContext;
 
         if (!sectionName) {
             validateField(sectionNameInput.parentElement, false);
@@ -1307,6 +1325,7 @@ async function handleMenuClick(event, parentMenu) {
         }, 500);
         return;
     }
+
     if (action === 'open-feedback-types-menu') {
         navigateToMenu('feedbackTypes');
         return;
