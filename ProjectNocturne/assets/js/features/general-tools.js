@@ -6,6 +6,7 @@ import { showDynamicIslandNotification } from '../ui/notification-controller.js'
 const DB_NAME = 'ProjectNocturneDB';
 const DB_VERSION = 1;
 const AUDIO_STORE_NAME = 'user_audio_store';
+const SOUNDS_SECTIONS_STORAGE_KEY = 'collapsed-sound-sections';
 
 let db = null;
 let dbPromise = null;
@@ -13,6 +14,7 @@ let dbPromise = null;
 let isCachePopulated = false;
 let userAudiosCache = [];
 let audioCachePromise = null;
+let collapsedSoundSections = new Set();
 
 function openDB() {
     if (dbPromise) {
@@ -309,64 +311,93 @@ function stopSound(toolId = 'global') {
     }
 }
 
+function loadCollapsedSoundSections() {
+    const stored = localStorage.getItem(SOUNDS_SECTIONS_STORAGE_KEY);
+    if (stored) {
+        try {
+            collapsedSoundSections = new Set(JSON.parse(stored));
+        } catch (e) {
+            collapsedSoundSections = new Set();
+        }
+    }
+}
+
+function saveCollapsedSoundSections() {
+    localStorage.setItem(SOUNDS_SECTIONS_STORAGE_KEY, JSON.stringify([...collapsedSoundSections]));
+}
+
+function toggleSoundSection(sectionId, headerElement) {
+    const content = headerElement.nextElementSibling;
+    if (!content || !content.classList.contains('sounds-list-content')) return;
+
+    const toggleBtn = headerElement.querySelector('.collapse-btn');
+    const isExpanding = !toggleBtn.classList.contains('expanded');
+
+    content.classList.toggle('active', isExpanding);
+    content.classList.toggle('disabled', !isExpanding);
+    toggleBtn.classList.toggle('expanded', isExpanding);
+    
+    if (isExpanding) {
+        collapsedSoundSections.delete(sectionId);
+    } else {
+        collapsedSoundSections.add(sectionId);
+    }
+    saveCollapsedSoundSections();
+}
+
 async function generateSoundList(uploadElement, listElement, actionName, activeSoundId = null) {
     await populateAudioCache();
+    loadCollapsedSoundSections();
 
-    if (!uploadElement || !listElement) {
+    if (!listElement) {
         return;
     }
 
-    // Hacemos visible el contenedor de carga de audio gestionando sus clases
-    uploadElement.classList.remove('disabled');
-    uploadElement.classList.add('active');
-
-    uploadElement.innerHTML = '';
     listElement.innerHTML = '';
 
-    const getTranslation = window.getTranslation || ((key) => key);
+    const createSection = (sectionId, titleKey, icon, sounds, isCustom) => {
+        const isCollapsed = collapsedSoundSections.has(sectionId);
 
-    const uploadListContainer = document.createElement('div');
-    uploadListContainer.className = 'menu-list';
-    const uploadLink = document.createElement('div');
-    uploadLink.className = 'menu-link';
-    uploadLink.dataset.action = 'upload-audio';
-    uploadLink.innerHTML = `
-        <div class="menu-link-icon"><span class="material-symbols-rounded">upload_file</span></div>
-        <div class="menu-link-text"><span data-translate="upload_audio" data-translate-category="sounds">${getTranslation('upload_audio', 'sounds')}</span></div>
-    `;
-    uploadListContainer.appendChild(uploadLink);
-    uploadElement.appendChild(uploadListContainer);
+        const header = document.createElement('div');
+        header.className = 'menu-content-header';
+        header.innerHTML = `
+            <div class="menu-content-header-primary">
+                <span class="material-symbols-rounded">${icon}</span>
+                <span data-translate="${titleKey}" data-translate-category="sounds">${getTranslation(titleKey, 'sounds')}</span>
+            </div>
+            <div class="menu-content-header-secondary">
+                <button class="collapse-btn ${isCollapsed ? '' : 'expanded'}">
+                    <span class="material-symbols-rounded expand-icon">expand_more</span>
+                </button>
+            </div>
+        `;
 
-    const soundListContainer = document.createElement('div');
-    soundListContainer.className = 'menu-list';
+        const listContent = document.createElement('div');
+        listContent.className = `menu-list sounds-list-content ${isCollapsed ? 'disabled' : 'active'}`;
+        
+        sounds.forEach(sound => {
+            const menuLink = createSoundMenuItem(sound, actionName, activeSoundId, isCustom);
+            listContent.appendChild(menuLink);
+        });
+        
+        header.addEventListener('click', () => toggleSoundSection(sectionId, header));
+
+        listElement.appendChild(header);
+        listElement.appendChild(listContent);
+    };
 
     const availableSounds = getAvailableSounds();
     const defaultSounds = availableSounds.filter(s => !s.isCustom);
     const userAudios = availableSounds.filter(s => s.isCustom);
 
-    const defaultSoundsHeader = document.createElement('div');
-    defaultSoundsHeader.className = 'menu-content-header'; // Corregido
-    defaultSoundsHeader.innerHTML = `<span>${getTranslation('default_audios', 'sounds')}</span>`;
-    soundListContainer.appendChild(defaultSoundsHeader);
-    defaultSounds.forEach(sound => {
-        const menuLink = createSoundMenuItem(sound, actionName, activeSoundId, false);
-        soundListContainer.appendChild(menuLink);
-    });
-
-    if (userAudios.length > 0) {
-        const userAudiosHeader = document.createElement('div');
-        userAudiosHeader.className = 'menu-content-header'; // Corregido
-        userAudiosHeader.innerHTML = `<span>${getTranslation('uploaded_audios', 'sounds')}</span>`;
-        soundListContainer.appendChild(userAudiosHeader);
-        userAudios.forEach(sound => {
-            const menuLink = createSoundMenuItem(sound, actionName, activeSoundId, true);
-            soundListContainer.appendChild(menuLink);
-        });
+    if (defaultSounds.length > 0) {
+        createSection('default_audios', 'default_audios', 'volume_up', defaultSounds, false);
     }
 
-    listElement.appendChild(soundListContainer);
+    if (userAudios.length > 0) {
+        createSection('uploaded_audios', 'uploaded_audios', 'music_note', userAudios, true);
+    }
 }
-
 function createSoundMenuItem(sound, actionName, activeSoundId, isCustom) {
     const menuLink = document.createElement('div');
     menuLink.className = 'menu-link';
