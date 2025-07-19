@@ -711,6 +711,7 @@ function initializeCentralizedFontManager() {
             globalScaleFactor = 1.0;
         }
     }
+    
     function saveFontScaleToStorage() {
         localStorage.setItem(STORAGE_KEY, globalScaleFactor.toString());
     }
@@ -1471,10 +1472,17 @@ function handleAlarmCardAction(action, alarmId, target) {
         return;
     }
 
+    // --- LÓGICA DE SEGURIDAD MEJORADA ---
+    const isRinging = window.alarmManager.isAnyAlarmRinging && window.alarmManager.isAnyAlarmRinging();
     const alarm = window.alarmManager.findAlarmById(alarmId);
-    if (alarm && alarm.isRinging && action !== 'dismiss-alarm') {
-        return;
+    
+    // Permitir solo la acción de descartar si esta alarma específica está sonando
+    if (isRinging) {
+        if (!alarm || !alarm.isRinging || action !== 'dismiss-alarm') {
+            return;
+        }
     }
+    // --- FIN DE LA LÓGICA DE SEGURIDAD ---
 
     switch (action) {
         case 'toggle-alarm':
@@ -1500,10 +1508,17 @@ function handleTimerCardAction(action, timerId, target) {
         return;
     }
 
+    // --- LÓGICA DE SEGURIDAD MEJORADA ---
+    const isRinging = window.timerManager.isAnyTimerRinging && window.timerManager.isAnyTimerRinging();
     const timer = window.timerManager.findTimerById(timerId);
-    if (timer && timer.isRinging && action !== 'dismiss-timer') {
-        return;
+
+    // Permitir solo la acción de descartar si este temporizador específico está sonando
+    if (isRinging) {
+        if (!timer || !timer.isRinging || action !== 'dismiss-timer') {
+            return;
+        }
     }
+    // --- FIN DE LA LÓGICA DE SEGURIDAD ---
 
     switch (action) {
         case 'pin-timer':

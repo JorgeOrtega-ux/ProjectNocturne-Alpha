@@ -25,7 +25,13 @@ const DEFAULT_TIMERS = [
     { id: 'default-timer-5', title: 'study_session_45', type: 'countdown', initialDuration: 2700000, remaining: 2700000, sound: 'gentle_chime', isRunning: false, isPinned: false }
 ];
 
+// --- FUNCIÓN DE SEGURIDAD ---
+function isAnyTimerRinging() {
+    return [...userTimers, ...defaultTimersState].some(t => t.isRinging);
+}
+
 function toggleTimersSection(type) {
+    // --- CORRECCIÓN: Se ha eliminado la guarda `if (isAnyTimerRinging()) return;` ---
     const grid = document.querySelector(`.tool-grid[data-timer-grid="${type}"]`);
     if (!grid) return;
     const container = grid.closest('.timers-container');
@@ -42,6 +48,7 @@ function toggleTimersSection(type) {
 }
 
 function createTimerSection(sectionName) {
+    if (isAnyTimerRinging()) return null;
     if (timerSections.length >= 10) {
         showDynamicIslandNotification(
             'error',
@@ -321,6 +328,7 @@ function loadAndRestoreTimers() {
 }
 
 function startTimer(timerId) {
+    if (isAnyTimerRinging()) return;
     const timer = findTimerById(timerId);
     if (!timer || timer.isRunning || (timer.remaining <= 0 && !timer.rangAt)) return;
 
@@ -346,6 +354,7 @@ function startTimer(timerId) {
 }
 
 function pauseTimer(timerId) {
+    if (isAnyTimerRinging()) return;
     const timer = findTimerById(timerId);
     if (!timer || !timer.isRunning) return;
 
@@ -375,6 +384,7 @@ function pauseTimer(timerId) {
 }
 
 function resetTimer(timerId) {
+    if (isAnyTimerRinging()) return;
     const timer = findTimerById(timerId);
     if (!timer) return;
 
@@ -404,6 +414,7 @@ function resetTimer(timerId) {
 }
 
 function updateTimer(timerId, newData) {
+    if (isAnyTimerRinging()) return;
     trackEvent('interaction', 'edit_timer');
 
     const timerIndex = userTimers.findIndex(t => t.id === timerId);
@@ -503,6 +514,7 @@ function updateTimerCardVisuals(timer) {
     card.classList.toggle('timer-finished', isFinished);
 }
 function updateTimerSection(sectionId, newName) {
+    if (isAnyTimerRinging()) return;
     const section = timerSections.find(s => s.id === sectionId);
     if (section) {
         section.name = newName;
@@ -559,23 +571,27 @@ function updateMainControlsState() {
     const addTimerBtn = section.querySelector('[data-module="toggleMenuTimer"]');
 
     if (!startBtn || !pauseBtn || !resetBtn || !addTimerBtn) return;
-
-    const pinnedTimer = findTimerById(pinnedTimerId);
-    let isAnyRinging = [...userTimers, ...defaultTimersState].some(t => t.isRinging);
-
-    addTimerBtn.classList.toggle('disabled-interactive', isAnyRinging);
-
-    if (pinnedTimer && pinnedTimer.type === 'countdown') {
-        const controlsState = getTimerControlsState(pinnedTimer);
-
-        startBtn.classList.toggle('disabled-interactive', controlsState.startDisabled);
-        pauseBtn.classList.toggle('disabled-interactive', controlsState.pauseDisabled);
-        resetBtn.classList.toggle('disabled-interactive', controlsState.resetDisabled);
-
-    } else {
+    
+    const isRinging = isAnyTimerRinging();
+    
+    addTimerBtn.classList.toggle('disabled-interactive', isRinging);
+    
+    if (isRinging) {
         startBtn.classList.add('disabled-interactive');
         pauseBtn.classList.add('disabled-interactive');
         resetBtn.classList.add('disabled-interactive');
+    } else {
+        const pinnedTimer = findTimerById(pinnedTimerId);
+        if (pinnedTimer && pinnedTimer.type === 'countdown') {
+            const controlsState = getTimerControlsState(pinnedTimer);
+            startBtn.classList.toggle('disabled-interactive', controlsState.startDisabled);
+            pauseBtn.classList.toggle('disabled-interactive', controlsState.pauseDisabled);
+            resetBtn.classList.toggle('disabled-interactive', controlsState.resetDisabled);
+        } else {
+            startBtn.classList.add('disabled-interactive');
+            pauseBtn.classList.add('disabled-interactive');
+            resetBtn.classList.add('disabled-interactive');
+        }
     }
 }
 
@@ -1011,6 +1027,7 @@ function formatTime(ms, type = 'countdown') {
 }
 
 function addTimerAndRender(timerData, sectionId = 'user') {
+    if (isAnyTimerRinging()) return;
     const newTimer = {
         id: `timer-${Date.now()}`,
         title: timerData.title,
@@ -1241,6 +1258,7 @@ function updateTimerCounts() {
 
 
 function handlePinTimer(timerId) {
+    if (isAnyTimerRinging()) return;
     if (pinnedTimerId === timerId) return;
 
     trackEvent('interaction', 'pin_timer');
@@ -1257,7 +1275,7 @@ function handlePinTimer(timerId) {
 }
 
 function handleEditTimer(timerId) {
-
+    if (isAnyTimerRinging()) return;
     const timerData = findTimerById(timerId);
     if (timerData) {
         if (timerData.type === 'count_to_date') {
@@ -1278,6 +1296,7 @@ function handleEditTimer(timerId) {
 }
 
 function handleDeleteTimer(timerId) {
+    if (isAnyTimerRinging()) return;
     if (timerId.startsWith('default-timer-')) {
         return;
     }
@@ -1443,6 +1462,7 @@ function initializeTimerSortable() {
     });
 }
 function deleteTimerSection(sectionId) {
+    if (isAnyTimerRinging()) return;
     const section = timerSections.find(s => s.id === sectionId);
     if (!section) return;
 
@@ -1528,6 +1548,7 @@ function initializeTimerController() {
         searchInput.addEventListener('input', e => renderTimerSearchResults(e.target.value.toLowerCase()));
     }
     function updateTimerSection(sectionId, newName) {
+        if (isAnyTimerRinging()) return;
         const section = timerSections.find(s => s.id === sectionId);
         if (section) {
             section.name = newName;
@@ -1567,7 +1588,8 @@ function initializeTimerController() {
         },
         renderAllTimerCards,
         getPinnedTimer: () => findTimerById(pinnedTimerId),
-        formatTime: formatTime
+        formatTime: formatTime,
+        isAnyTimerRinging
     };
 
     updateEverythingWidgets();

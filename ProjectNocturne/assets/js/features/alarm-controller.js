@@ -25,6 +25,11 @@ let userAlarms = [];
 let defaultAlarmsState = [];
 let alarmSections = [];
 
+// --- FUNCIÓN DE SEGURIDAD ---
+function isAnyAlarmRinging() {
+    return [...userAlarms, ...defaultAlarmsState].some(a => a.isRinging);
+}
+
 function toggleAlarmsSection(type) {
     const grid = document.querySelector(`.tool-grid[data-alarm-grid="${type}"]`);
     if (!grid) return;
@@ -42,6 +47,7 @@ function toggleAlarmsSection(type) {
 }
 
 function createAlarmSection(sectionName) {
+    if (isAnyAlarmRinging()) return null;
     if (alarmSections.length >= 11) {
         showDynamicIslandNotification(
             'error',
@@ -174,6 +180,7 @@ function getAlarmControlsState(alarm) {
 function checkAlarms() {
     const now = new Date();
     if (now.getSeconds() !== 0) return;
+    if (isAnyAlarmRinging()) return;
 
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
@@ -281,6 +288,7 @@ function loadAndRestoreAlarms() {
 }
 
 function toggleAlarm(alarmId) {
+    if (isAnyAlarmRinging()) return;
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
 
@@ -303,6 +311,7 @@ function toggleAlarm(alarmId) {
 }
 
 function updateAlarm(alarmId, newData) {
+    if (isAnyAlarmRinging()) return;
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
 
@@ -386,41 +395,34 @@ function updateAlarmCardVisuals(alarm) {
 }
 
 function updateAlarmControlsState() {
-    const isAnyRinging = [...userAlarms, ...defaultAlarmsState].some(a => a.isRinging);
+    const isRinging = isAnyAlarmRinging();
+    const ringingAlarmId = isRinging ? [...userAlarms, ...defaultAlarmsState].find(a => a.isRinging)?.id : null;
 
-    const addAlarmBtns = document.querySelectorAll('[data-module="toggleMenuAlarm"]');
-    addAlarmBtns.forEach(btn => {
-        btn.classList.toggle('disabled-interactive', isAnyRinging);
-    });
+    const allControls = document.querySelectorAll(
+        '.section-alarm [data-action], .section-alarm [data-module="toggleMenuAlarm"]'
+    );
 
-    const allCards = document.querySelectorAll('.tool-card.alarm-card, .search-result-item[data-type="alarm"]');
-    allCards.forEach(card => {
-        const alarm = findAlarmById(card.dataset.id);
-        if (!alarm) return;
+    allControls.forEach(control => {
+        const card = control.closest('.tool-card, .search-result-item');
+        const cardId = card?.dataset.id;
+        const action = control.dataset.action || control.dataset.module;
 
-        const controlsState = getAlarmControlsState(alarm);
-        const menuLinks = card.querySelectorAll('.card-dropdown-menu .menu-link');
-
-        menuLinks.forEach(link => {
-            const action = link.dataset.action;
-
-            switch (action) {
-                case 'toggle-alarm':
-                    link.classList.toggle('disabled-interactive', controlsState.toggleDisabled);
-                    break;
-                case 'test-alarm':
-                    link.classList.toggle('disabled-interactive', controlsState.testDisabled);
-                    break;
-                case 'edit-alarm':
-                    link.classList.toggle('disabled-interactive', controlsState.editDisabled);
-                    break;
-                case 'delete-alarm':
-                    link.classList.toggle('disabled-interactive', controlsState.deleteDisabled);
-                    break;
+        const isDismissAction = action === 'dismiss-alarm';
+        const isRingingCardControl = cardId === ringingAlarmId;
+        
+        let shouldBeDisabled = false;
+        if (isRinging) {
+            if (isRingingCardControl) {
+                shouldBeDisabled = !isDismissAction;
+            } else {
+                shouldBeDisabled = true;
             }
-        });
+        }
+
+        control.classList.toggle('disabled-interactive', shouldBeDisabled);
     });
 }
+
 
 function triggerAlarm(alarm) {
     let soundToPlay = alarm.sound;
@@ -718,6 +720,7 @@ function getAlarmLimit() {
 }
 
 function createAlarm(title, hour, minute, sound, sectionId = 'user') {
+    if (isAnyAlarmRinging()) return false;
     const alarmLimit = getAlarmLimit();
     if (userAlarms.length >= alarmLimit) {
         showDynamicIslandNotification(
@@ -816,6 +819,7 @@ function findAlarmById(alarmId) {
 }
 
 function deleteAlarm(alarmId) {
+    if (isAnyAlarmRinging()) return;
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
     if (alarm.type === 'default') {
@@ -951,6 +955,7 @@ function updateLocalTime() {
     }
 }
 function handleEditAlarm(alarmId) {
+    if (isAnyAlarmRinging()) return;
     const alarmData = findAlarmById(alarmId);
     if (alarmData) {
         prepareAlarmForEdit(alarmData);
@@ -966,6 +971,7 @@ function handleEditAlarm(alarmId) {
 }
 
 function handleDeleteAlarm(alarmId) {
+    if (isAnyAlarmRinging()) return;
     const alarm = findAlarmById(alarmId);
     if (!alarm) return;
 
@@ -979,6 +985,7 @@ function handleDeleteAlarm(alarmId) {
 }
 
 function testAlarm(alarmId) {
+    if (isAnyAlarmRinging()) return;
     const alarm = findAlarmById(alarmId);
     if (alarm && alarm.sound) {
         playSound(alarm.sound);
@@ -1096,6 +1103,7 @@ function initializeAlarmSortable() {
     });
 }
 function deleteAlarmSection(sectionId) {
+    if (isAnyAlarmRinging()) return;
     const section = alarmSections.find(s => s.id === sectionId);
     if (!section) return;
 
@@ -1109,6 +1117,7 @@ function deleteAlarmSection(sectionId) {
     showDynamicIslandNotification('success', 'section_deleted', 'notifications', { name: section.name });
 }
 function updateAlarmSection(sectionId, newName) {
+    if (isAnyAlarmRinging()) return;
     const section = alarmSections.find(s => s.id === sectionId);
     if (section) {
         section.name = newName;
