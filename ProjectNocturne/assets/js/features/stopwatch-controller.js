@@ -106,17 +106,6 @@ function updateDisplay() {
         displayElement.innerHTML = formatTime(currentTime);
     }
 
-    const activeSection = document.querySelector('.section-stopwatch.active');
-    if (activeSection) {
-        if (stopwatchState.isRunning) {
-            document.title = `ProjectNocturne - ${formatTime(currentTime, true)}`;
-        } else {
-            // Si está pausado o reseteado, muestra el tiempo actual estático o el título por defecto
-            const title = stopwatchState.elapsedTime > 0 ? formatTime(stopwatchState.elapsedTime, true) : getTranslation('stopwatch', 'tooltips');
-            document.title = `ProjectNocturne - ${title}`;
-        }
-    }
-
     if (stopwatchState.isRunning) {
         stopwatchState.animationFrameId = requestAnimationFrame(updateDisplay);
     }

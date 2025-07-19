@@ -3,17 +3,53 @@ import { playSound, stopSound } from '../features/general-tools.js';
 import { activateModule, deactivateModule, isModuleActive, showSpecificOverlay, toggleModule } from '../app/main.js';
 
 let timeAgoIntervals = {};
+let blinkingTitleInterval = null; // Controlador central para el parpadeo del título
 
+// Limpia todos los intervalos de tiempo transcurrido.
 function clearAllRingingIntervals() {
     Object.values(timeAgoIntervals).forEach(clearInterval);
     timeAgoIntervals = {};
 }
 
-/**
- * Formatea el tiempo transcurrido en un formato detallado y legible.
- * @param {number} timestamp - El momento en que sonó la herramienta.
- * @returns {string} - El tiempo transcurrido formateado (ej: "1 minuto 30 segundos").
- */
+// NUEVA FUNCIÓN: Actualiza el título parpadeante
+function updateBlinkingTitle() {
+    if (blinkingTitleInterval) {
+        clearInterval(blinkingTitleInterval);
+        blinkingTitleInterval = null;
+    }
+
+    const latestTool = getLatestRingingTool();
+    if (!latestTool) {
+        // Si no hay herramientas sonando, restaura el título de la sección actual
+        if (window.titleManager && typeof window.titleManager.updateTitleForCurrentSection === 'function') {
+            window.titleManager.updateTitleForCurrentSection();
+        }
+        return;
+    }
+
+    const originalTitle = `ProjectNocturne - ${getTranslation(latestTool.toolType, 'tooltips')}`;
+    let isTitleVisible = true;
+    let titleText = '';
+
+    if (latestTool.toolType === 'alarm') {
+        const alarmTime = window.alarmManager.formatTimeForTitle(latestTool.hour, latestTool.minute);
+        titleText = `ProjectNocturne - ${alarmTime}`;
+    } else { // timer
+        const remainingTime = window.timerManager.formatTime(0, latestTool.type);
+        titleText = `ProjectNocturne - ${remainingTime}`;
+    }
+
+    const blink = () => {
+        document.title = isTitleVisible ? titleText : originalTitle;
+        isTitleVisible = !isTitleVisible;
+    };
+
+    blink(); // Muestra el título inmediatamente
+    blinkingTitleInterval = setInterval(blink, 1000);
+}
+
+// ... (resto de las funciones como formatDetailedTimeSince)
+
 function formatDetailedTimeSince(timestamp) {
     const totalSeconds = Math.floor((Date.now() - timestamp) / 1000);
     if (totalSeconds < 0) return `0 ${getTranslation('seconds', 'timer')}`;
@@ -30,13 +66,10 @@ function formatDetailedTimeSince(timestamp) {
     if (seconds > 0) parts.push(`${seconds} ${getTranslation('seconds', 'timer')}`);
 
     if (parts.length > 2) {
-        // Muestra solo las dos unidades de tiempo más grandes (ej: "1 día 5 horas")
         return parts.slice(0, 2).join(' ');
     } else if (parts.length > 0) {
-        // Muestra una o dos unidades de tiempo (ej: "5 minutos 10 segundos" o "10 segundos")
         return parts.join(' ');
     } else {
-        // Si el tiempo es 0, muestra "0 segundos"
         return `0 ${getTranslation('seconds', 'timer')}`;
     }
 }
@@ -108,7 +141,6 @@ function getLatestRingingTool() {
 }
 
 function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
-    // Forzar la salida del modo de pantalla completa si está activo.
     if (document.fullscreenElement) {
         document.exitFullscreen();
     }
@@ -125,15 +157,17 @@ function showRingingScreen(toolType, data, onDismiss, onSnooze, onRestart) {
     }
 
     activateModule('toggleNotificationsOverlay');
-
-    // El contenido del setTimeout se ha movido aquí directamente
+    
     const latestTool = getLatestRingingTool();
     if (latestTool) {
         showDetailView(latestTool.toolId);
     }
     playSound(data.sound, toolId);
     updateRestoreButton();
+    updateBlinkingTitle(); // MODIFICADO: Llamada a la función central
 }
+
+// ... (resto del código de showDetailView, showListView, etc. sin cambios)
 function showDetailView(toolId) {
     const menu = document.querySelector('.menu-notifications');
     if (!menu) return;
@@ -253,8 +287,6 @@ function updateRingingUIDetail(toolId) {
 
     const updateTime = () => {
         if (timeAgoInput) {
-            // **AQUÍ ESTÁ EL CAMBIO**
-            // Se utiliza la nueva función para mostrar el tiempo de forma detallada.
             timeAgoInput.value = formatDetailedTimeSince(toolData.rangAt);
         }
     };
@@ -363,6 +395,10 @@ function hideRingingScreen(toolId) {
     }
 
     updateRestoreButton();
+    updateBlinkingTitle(); // MODIFICADO: Llamada a la función central
 }
+
+// NUEVA FUNCIÓN: Exporta una función para verificar si hay herramientas sonando
+window.isAnyToolRinging = () => Object.keys(window.ringingState.tools).length > 0;
 
 export { showRingingScreen, hideRingingScreen, initializeRingingController };

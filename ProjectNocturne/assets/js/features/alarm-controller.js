@@ -25,10 +25,6 @@ let userAlarms = [];
 let defaultAlarmsState = [];
 let alarmSections = [];
 
-function dispatchAlarmStateChange() {
-    document.dispatchEvent(new CustomEvent('alarmStateChanged'));
-}
-
 function toggleAlarmsSection(type) {
     const grid = document.querySelector(`.tool-grid[data-alarm-grid="${type}"]`);
     if (!grid) return;
@@ -304,7 +300,6 @@ function toggleAlarm(alarmId) {
     refreshSearchResults();
     updateEverythingWidgets();
     updateAlarmControlsState();
-    dispatchAlarmStateChange();
 }
 
 function updateAlarm(alarmId, newData) {
@@ -338,7 +333,6 @@ function updateAlarm(alarmId, newData) {
     const translatedTitle = alarm.type === 'default' ? getTranslation(alarm.title, 'alarms') : alarm.title;
     showDynamicIslandNotification('success', 'alarm_updated', 'notifications', { title: translatedTitle });
     updateEverythingWidgets();
-    dispatchAlarmStateChange();
 }
 
 function updateAlarmCardVisuals(alarm) {
@@ -448,7 +442,6 @@ function triggerAlarm(alarm) {
 
     updateAlarmCardVisuals(alarm);
     updateAlarmControlsState();
-    dispatchAlarmStateChange();
 
     const translatedTitle = alarm.type === 'default' ? getTranslation(alarm.title, 'alarms') : alarm.title;
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -501,7 +494,6 @@ function dismissAlarm(alarmId) {
     updateEverythingWidgets();
     refreshSearchResults();
     updateAlarmControlsState();
-    dispatchAlarmStateChange();
 
     const alarmCard = document.getElementById(alarmId);
     if (alarmCard) {
@@ -527,7 +519,6 @@ function snoozeAlarm(alarmId) {
         now.getMinutes(),
         alarm.sound
     );
-    dispatchAlarmStateChange();
 }
 
 function renderAlarmSearchResults(searchTerm) {
@@ -755,7 +746,6 @@ function createAlarm(title, hour, minute, sound, sectionId = 'user') {
     updateAlarmCounts();
     showDynamicIslandNotification('success', 'alarm_created', 'notifications', { title: alarm.title });
     updateEverythingWidgets();
-    dispatchAlarmStateChange();
     return true;
 }
 
@@ -772,7 +762,7 @@ function renderAllAlarmCards() {
     });
 
     defaultAlarmsState.forEach(alarm => {
-        const grid = document.querySelector('.tool-grid[data-alarm-grid="default"]');
+        const grid = document.querySelector(`.tool-grid[data-alarm-grid="default"]`);
         if(grid){
             const card = createAlarmCardFromData(alarm);
             grid.appendChild(card);
@@ -852,7 +842,6 @@ function deleteAlarm(alarmId) {
     showDynamicIslandNotification('success', 'alarm_deleted', 'notifications', { title: originalTitle });
     refreshSearchResults();
     updateEverythingWidgets();
-    dispatchAlarmStateChange();
 }
 
 function saveAlarmsToStorage() {
@@ -913,19 +902,6 @@ function formatTime(hour, minute) {
     return `${timeString}<span class="ampm">${ampmString}</span>`;
 }
 
-function formatTimeForTitle(hour, minute) {
-    if (use24HourFormat) {
-        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-    }
-
-    const tempDate = new Date();
-    tempDate.setHours(hour, minute, 0, 0);
-
-    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
-    return new Intl.DateTimeFormat(navigator.language, options).format(tempDate);
-}
-
-
 function applyCollapsedSectionsState() {
     document.querySelectorAll('.alarms-container').forEach(container => {
         const type = container.dataset.container;
@@ -971,16 +947,6 @@ function updateLocalTime() {
 
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('alarm');
-        }
-
-        const activeSection = document.querySelector('.section-alarm.active');
-        if (activeSection) {
-            const nextAlarmTime = window.alarmManager.getNextAlarmDetails();
-            const alarmTitle = nextAlarmTime || getTranslation('alarms', 'tooltips');
-            const newTitle = `ProjectNocturne - ${alarmTitle}`;
-            if(document.title !== newTitle) {
-                document.title = newTitle;
-            }
         }
     }
 }
@@ -1222,34 +1188,7 @@ function initializeAlarmClock() {
             saveAlarmsToStorage();
             saveDefaultAlarmsOrder();
         },
-        renderAllAlarmCards,
-        getNextAlarmDetails: () => {
-            const activeAlarms = [...userAlarms, ...defaultAlarmsState].filter(a => a.enabled);
-            if (activeAlarms.length === 0) return null;
-
-            const now = new Date();
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-
-            let nextAlarm = null;
-            let minDiff = Infinity;
-
-            activeAlarms.forEach(alarm => {
-                const alarmTime = alarm.hour * 60 + alarm.minute;
-                let diff = alarmTime - currentTime;
-                if (diff < 0) { // Si la alarma es para el día siguiente
-                    diff += 24 * 60;
-                }
-
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nextAlarm = alarm;
-                }
-            });
-
-            if (!nextAlarm) return null;
-
-            return formatTimeForTitle(nextAlarm.hour, nextAlarm.minute);
-        }
+        renderAllAlarmCards
     };
 
     updateEverythingWidgets();

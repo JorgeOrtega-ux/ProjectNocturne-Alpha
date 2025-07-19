@@ -596,13 +596,6 @@ function updateMainPinnedDisplay(card) {
             else ampmEl.textContent = '';
         }
         
-        // Actualización sincronizada del título
-        const activeSection = document.querySelector('.section-worldClock.active');
-        if (activeSection) {
-            const titleTimeString = now.toLocaleTimeString(navigator.language, timeOptions);
-            document.title = `ProjectNocturne - ${titleTimeString}`;
-        }
-
         if (window.centralizedFontManager) {
             window.centralizedFontManager.adjustAndApplyFontSizeToSection('worldClock');
         }

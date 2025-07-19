@@ -3,7 +3,6 @@ import { initializeTextStyleManager } from '../features/general-tools.js';
 import { isGradientColor } from '../ui/palette-colors.js';
 import { populateHourSelectionMenu } from '../ui/menu-interactions.js';
 import { trackEvent } from '../services/event-tracker.js';
-import { updateTitleForSection } from '../core/title-manager.js';
 
 let use24HourFormat = localStorage.getItem('use24HourFormat') === 'false' ? false : true;
 let allowCardMovement = true;
@@ -109,7 +108,6 @@ function activateSection(sectionName, showLog = true) {
         logSectionStates();
     }
 
-    updateTitleForSection(sectionName);
     const event = new CustomEvent('sectionChanged', {
         detail: {
             activeSection: sectionName,
@@ -182,25 +180,6 @@ function initSectionManagement() {
                 activateSection(sectionName);
             }
         });
-    });
-
-    // Listen for state changes to update titles dynamically
-    document.addEventListener('alarmStateChanged', () => {
-        if (getActiveSection() === 'alarm') {
-            updateTitleForSection('alarm');
-        }
-    });
-
-    document.addEventListener('timerStateChanged', () => {
-        if (getActiveSection() === 'timer') {
-            updateTitleForSection('timer');
-        }
-    });
-
-    document.addEventListener('stopwatchStateChanged', () => {
-        if (getActiveSection() === 'stopwatch') {
-            updateTitleForSection('stopwatch');
-        }
     });
 
     switchToToolsView(false);

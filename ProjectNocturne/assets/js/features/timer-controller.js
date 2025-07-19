@@ -123,10 +123,6 @@ function renderTimerSections() {
 }
 
 
-function dispatchTimerStateChange() {
-    document.dispatchEvent(new CustomEvent('timerStateChanged'));
-}
-
 function formatTimeSince(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
     const minute = 60, hour = 3600, day = 86400, year = 31536000;
@@ -347,7 +343,6 @@ function startTimer(timerId) {
     refreshSearchResults();
     updateEverythingWidgets();
     saveAllTimersState();
-    dispatchTimerStateChange();
 }
 
 function pauseTimer(timerId) {
@@ -377,7 +372,6 @@ function pauseTimer(timerId) {
     refreshSearchResults();
     updateEverythingWidgets();
     saveAllTimersState();
-    dispatchTimerStateChange();
 }
 
 function resetTimer(timerId) {
@@ -407,7 +401,6 @@ function resetTimer(timerId) {
     refreshSearchResults();
     updateEverythingWidgets();
     saveAllTimersState();
-    dispatchTimerStateChange();
 }
 
 function updateTimer(timerId, newData) {
@@ -463,7 +456,6 @@ function updateTimer(timerId, newData) {
     const titleForNotification = updatedTimer.id.startsWith('default-timer-') ? getTranslation(updatedTimer.title, 'timer') : updatedTimer.title;
     showDynamicIslandNotification('success', 'timer_updated', 'notifications', { title: titleForNotification });
     updateEverythingWidgets();
-    dispatchTimerStateChange();
 }
 
 function updateTimerCardVisuals(timer) {
@@ -893,7 +885,6 @@ function dismissTimer(timerId) {
         refreshSearchResults();
         updateEverythingWidgets();
         saveAllTimersState();
-        dispatchTimerStateChange();
     }
 }
 function getTimersCount() {
@@ -954,10 +945,6 @@ function startCountdownTimer(timer) {
         updateCardDisplay(timer.id);
         if (timer.id === pinnedTimerId) {
             updateMainDisplay();
-            const activeSection = document.querySelector('.section-timer.active');
-            if (activeSection) {
-                document.title = `ProjectNocturne - ${formatTime(timer.remaining, timer.type)}`;
-            }
         }
 
         if (rawRemaining <= 0) {
@@ -986,10 +973,6 @@ function startCountToDateTimer(timer) {
         updateCardDisplay(timer.id);
         if (timer.id === pinnedTimerId) {
             updateMainDisplay();
-            const activeSection = document.querySelector('.section-timer.active');
-            if (activeSection) {
-                document.title = `ProjectNocturne - ${formatTime(timer.remaining, timer.type)}`;
-            }
         }
 
         if (rawRemaining <= 0) {
@@ -1077,7 +1060,6 @@ function addTimerAndRender(timerData, sectionId = 'user') {
 
     showDynamicIslandNotification('success', 'timer_created', 'notifications', { title: newTimer.title });
     updateEverythingWidgets();
-    dispatchTimerStateChange();
 }
 
 function renderAllTimerCards() {
@@ -1093,7 +1075,7 @@ function renderAllTimerCards() {
     });
 
     defaultTimersState.forEach(timer => {
-        const grid = document.querySelector('.tool-grid[data-timer-grid="default"]');
+        const grid = document.querySelector(`.tool-grid[data-timer-grid="default"]`);
         if (grid) {
             const card = createTimerCardFromData(timer);
             grid.appendChild(card);
@@ -1272,7 +1254,6 @@ function handlePinTimer(timerId) {
     updateMainControlsState();
     saveTimersToStorage();
     saveDefaultTimersOrder();
-    dispatchTimerStateChange();
 }
 
 function handleEditTimer(timerId) {
@@ -1347,7 +1328,6 @@ function handleDeleteTimer(timerId) {
                 title: originalTitle
             });
             updateEverythingWidgets();
-            dispatchTimerStateChange();
         });
     }, 50);
 }
