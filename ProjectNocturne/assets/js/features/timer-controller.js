@@ -173,8 +173,8 @@ function getTimerControlsState(timer) {
             startDisabled: true,
             pauseDisabled: true,
             resetDisabled: true,
-            editDisabled: isRinging || isRunning,
-            deleteDisabled: isRinging || isRunning,
+            editDisabled: isRinging,
+            deleteDisabled: isRinging,
             showPlayPause: false,
             showReset: false,
             isRinging,
@@ -193,8 +193,8 @@ function getTimerControlsState(timer) {
         startDisabled: isRinging || isRunning || !canStart,
         pauseDisabled: isRinging || !isRunning,
         resetDisabled,
-        editDisabled: isRinging || isRunning,
-        deleteDisabled: isRinging || isRunning,
+        editDisabled: isRinging, // Corregido
+        deleteDisabled: isRinging, // Corregido
         showPlayPause: true,
         showReset: true,
         playPauseAction: isRunning ? 'pause-card-timer' : 'start-card-timer',
@@ -205,7 +205,6 @@ function getTimerControlsState(timer) {
         hasRangAt
     };
 }
-
 function loadAndRestoreTimers() {
     const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
     const lastVisitTime = lastVisit ? parseInt(lastVisit, 10) : null;

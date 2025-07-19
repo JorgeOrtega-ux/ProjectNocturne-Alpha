@@ -907,13 +907,6 @@
 }
 
 
-
-
-.island-content-wrapper {
-    display: flex;
-    flex-direction: row;
-}
-
 .card-options-container {
     position: relative;
     gap: 8px;
@@ -1237,10 +1230,7 @@
 /* == RINGING BUTTON STATE (DARK) == */
 /* ====================================== */
 
-.dark-mode .header-button.is-ringing {
-    background-color: #ffffff20;
-    border-color: #ffffff20;
-}
+
 .clock-date {
     width: max-content;
     font-size: 1.2rem;
@@ -1387,11 +1377,7 @@
     align-items: center;
 }
 
-.dark-mode .ringing-restore-btn {
-    border-color: #ffffff20;
-    filter: unset;
-    color: #ffffff;
-}
+
 
 .ringing-restore-btn.active {
     display: flex;
@@ -1401,23 +1387,13 @@
     background-color: #f5f5fa;
 }
 
-.dark-mode .ringing-restore-btn:hover {
-    background-color: #ffffff20;
-}
 
-.dark-mode .menu-button {
-    color: #fff;
-    border-color: #ffffff20;
-}
 
 #ringing-detail-view {
     flex-direction: column;
     gap: 8px;
 }
 
-/* assets/css/tools/tools.css (Corregido) */
-
-/* Aplica el estilo AM/PM pequeño solo a los relojes de las herramientas principales */
 .tool-alarm .ampm,
 .tool-timer .ampm,
 .tool-worldClock .ampm {

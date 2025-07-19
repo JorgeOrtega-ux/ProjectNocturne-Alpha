@@ -132,7 +132,21 @@
 .dark-mode .menu-section-selector {
     border-color: #ffffff20;
 }
+.dark-mode .ringing-restore-btn:hover {
+    background-color: #ffffff20;
+}
 
+.dark-mode .menu-button {
+    color: #fff;
+    border-color: #ffffff20;
+}.dark-mode .ringing-restore-btn {
+    border-color: #ffffff20;
+    filter: unset;
+    color: #ffffff;
+}.dark-mode .header-button.is-ringing {
+    background-color: #ffffff20;
+    border-color: #ffffff20;
+}
 /* ====================================== */
 /* ========= MODULES & OVERLAYS ========= */
 /* ====================================== */
