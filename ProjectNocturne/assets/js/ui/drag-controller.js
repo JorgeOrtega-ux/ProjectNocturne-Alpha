@@ -21,16 +21,12 @@ let dragHandleElement = null; // El elemento .drag-handle que inició el arrastr
  * Función principal para inicializar el controlador de arrastre en dispositivos móviles.
  */
 function initMobileDragController() {
-    if (window.innerWidth > 468) {
-        return;
-    }
-    if (isEnabled) {
-        return;
-    }
-    setupDragListeners();
     setupMobileClickListeners();
     setupResizeListener();
-    isEnabled = true;
+    // Decide si activar o no la funcionalidad de arrastre al cargar la página
+    if (window.innerWidth <= 468) {
+        enableDrag();
+    }
 }
 
 /**
@@ -46,13 +42,25 @@ function setupDragListeners() {
 }
 
 /**
+ * Elimina los listeners para los eventos de arrastre.
+ */
+function removeDragListeners() {
+    document.removeEventListener('touchstart', handleDragStart, { passive: false });
+    document.removeEventListener('touchmove', handleDragMove, { passive: false });
+    document.removeEventListener('touchend', handleDragEnd);
+    document.removeEventListener('mousedown', handleDragStart);
+    document.removeEventListener('mousemove', handleDragMove);
+    document.removeEventListener('mouseup', handleDragEnd);
+}
+
+/**
  * Configura los listeners para cerrar los menús al hacer clic en el fondo oscuro.
  */
 function setupMobileClickListeners() {
     const modulesToSetup = [
         { selector: '.module-control-center', name: 'controlCenter' },
         { selector: '.module-overlay', name: 'overlayContainer' },
-        { selector: '.module-overlay-right', name: 'overlayContainerRight' } // Añadido
+        { selector: '.module-overlay-right', name: 'overlayContainerRight' }
     ];
 
     modulesToSetup.forEach(config => {
@@ -82,7 +90,6 @@ function setupMobileClickListeners() {
     }
 }
 
-
 /**
  * Configura un listener para activar/desactivar la funcionalidad de arrastre
  * según el tamaño de la pantalla.
@@ -108,7 +115,7 @@ function handleDragStart(e) {
     if (!dragTarget) return;
 
     const moduleInfo = getModuleFromDragTarget(dragTarget);
-    if (!moduleInfo || !moduleInfo.module.classList.contains('active')) return;
+    if (!moduleInfo || !moduleInfo.module.classList.contains('active') || !moduleInfo.menu) return;
 
     isDragging = true;
     activeModule = moduleInfo.module;
@@ -285,13 +292,15 @@ function getModuleNameFromElement(moduleElement) {
 
 
 function enableDrag() {
-    if (window.innerWidth <= 468) {
+    if (window.innerWidth <= 468 && !isEnabled) {
+        setupDragListeners();
         isEnabled = true;
         document.querySelectorAll('.drag-handle').forEach(h => h.style.cursor = 'grab');
     }
 }
 
 function disableDrag() {
+    removeDragListeners();
     isEnabled = false;
     isDragging = false;
     document.querySelectorAll('.drag-handle').forEach(h => h.style.cursor = '');
