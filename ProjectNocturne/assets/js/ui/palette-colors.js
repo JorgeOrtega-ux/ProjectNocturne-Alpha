@@ -1,5 +1,22 @@
 import { attachTooltipsToNewElements } from './tooltip-controller.js';
 
+// --- Estado para el módulo de búsqueda y sus dependencias ---
+let isColorSearchSystemLoading = false;
+let isColorSearchSystemLoaded = false;
+let colorSearchModule = null;
+let pendingSearchQuery = null;
+
+// --- Función para cargar scripts dinámicamente ---
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
 const COLOR_SYSTEM_CONFIG = {
     currentColor: 'auto',
     currentTheme: 'system',
@@ -30,6 +47,9 @@ const COLOR_SYSTEM_CONFIG = {
     ],
     collapsedSectionsKey: 'collapsed-color-sections',
     moveRecentToFront: true,
+    searchInput: '.menu-component[data-menu="paletteColors"] .search-content-text input',
+    searchColorsWrapper: '[data-colors-wrapper="search"]',
+    debounceDelay: 300
 };
 
 const colorSystemState = {
@@ -39,8 +59,38 @@ const colorSystemState = {
     colorElements: new Map(),
     recentColors: [],
     isThemeChanging: false,
-    collapsedSections: new Set()
+    collapsedSections: new Set(),
+    searchTimeout: null
 };
+
+function showSearchSpinner() {
+    const searchResultsWrapper = document.querySelector(COLOR_SYSTEM_CONFIG.searchColorsWrapper);
+    if (searchResultsWrapper) {
+        if(window.colorSearchManager && typeof window.colorSearchManager.hideOtherSections === 'function') {
+            window.colorSearchManager.hideOtherSections();
+        } else {
+            const mainWrapper = document.querySelector('[data-colors-wrapper="main"]');
+            if (mainWrapper) {
+                mainWrapper.classList.remove('active');
+                mainWrapper.classList.add('disabled');
+            }
+        }
+        searchResultsWrapper.classList.remove('disabled');
+        searchResultsWrapper.classList.add('active');
+        searchResultsWrapper.innerHTML = `
+            <div class="menu-content-general" style="display:flex; justify-content:center; align-items:center; min-height: 150px;">
+                <span class="material-symbols-rounded spinning" style="font-size: 36px;">progress_activity</span>
+            </div>
+        `;
+    }
+}
+
+function hideSearchSpinner() {
+    const searchResultsWrapper = document.querySelector(COLOR_SYSTEM_CONFIG.searchColorsWrapper);
+    if (searchResultsWrapper) {
+        searchResultsWrapper.innerHTML = '';
+    }
+}
 
 function getTranslation(key, category = 'tooltips') {
     if (typeof window.getTranslation === 'function') {
@@ -122,9 +172,12 @@ function handleThemeColorCompatibility() {
     }, 200);
 }
 
+// CORREGIDO: Se añade una verificación para asegurar que `chroma` está definido.
 function isValidForTheme(hex) {
     if (hex === 'auto') return true;
     if (isGradientColor(hex)) return true;
+    // Si chroma.js aún no se ha cargado, asumimos que el color es válido para evitar errores.
+    if (typeof chroma === 'undefined') return true;
     try {
         const color = chroma(hex);
         const luminance = color.luminance();
@@ -165,7 +218,7 @@ function initColorTextSystem() {
     loadCollapsedSectionsState();
     setupColorElements();
     attachEventListeners();
-    setupGlobalListeners(); // ¡Llamada a la nueva función centralizada!
+    setupGlobalListeners();
     applyStoredColor();
     setInitialActiveState();
     renderRecentColors('initial');
@@ -174,11 +227,7 @@ function initColorTextSystem() {
     setupLanguageChangeListener();
     updateColorSectionHeaders();
     setupCollapsibleSections();
-    setTimeout(() => {
-        if (window.colorSearchManager && !window.colorSearchManager.getState().isInitialized) {
-            window.colorSearchManager.init();
-        }
-    }, 100);
+    
     document.addEventListener('searchColorSelected', (e) => {
         if (e.detail && e.detail.color) {
             if (isGradientColor(e.detail.color) || isValidForTheme(e.detail.color)) {
@@ -680,6 +729,12 @@ function attachEventListeners() {
     });
     setupRecentColorEvents();
     setupCollapsibleSectionEvents();
+    
+    const searchInput = document.querySelector(COLOR_SYSTEM_CONFIG.searchInput);
+    if (searchInput && !searchInput.hasAttribute('data-search-listener')) {
+        searchInput.addEventListener('input', handleSearchInput);
+        searchInput.setAttribute('data-search-listener', 'true');
+    }
 }
 
 function setupMutationObserver() {
@@ -733,12 +788,80 @@ function setupModuleEventListeners() {
         if (e.detail && e.detail.module === 'togglePaletteColors') {
             setTimeout(() => {
                 refreshColorSystem();
+
+                if (!isColorSearchSystemLoaded && !isColorSearchSystemLoading) {
+                    isColorSearchSystemLoading = true;
+                    loadScript('https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js')
+                        .then(() => {
+                            return import('../ui/color-search-system.js');
+                        })
+                        .then(module => {
+                            colorSearchModule = module;
+                            if (colorSearchModule.initColorSearchSystem) {
+                                colorSearchModule.initColorSearchSystem();
+                            }
+                            isColorSearchSystemLoaded = true;
+                            isColorSearchSystemLoading = false;
+                            
+                            if (pendingSearchQuery) {
+                                hideSearchSpinner();
+                                colorSearchModule.performSearch(pendingSearchQuery);
+                                pendingSearchQuery = null;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Failed to load color search system dependencies:", err);
+                            isColorSearchSystemLoading = false;
+                            hideSearchSpinner();
+                        });
+                }
+
             }, 100);
         }
     });
     document.addEventListener('textColorChanged', (e) => {
     });
 }
+
+function handleSearchInput(e) {
+    const query = e.target.value.trim();
+    if (colorSystemState.searchTimeout) {
+        clearTimeout(colorSystemState.searchTimeout);
+    }
+    
+    if (!query) {
+        if(isColorSearchSystemLoaded && colorSearchModule) {
+            colorSearchModule.clearSearchColors();
+        } else {
+            const searchResultsWrapper = document.querySelector(COLOR_SYSTEM_CONFIG.searchColorsWrapper);
+            if (searchResultsWrapper) {
+                searchResultsWrapper.innerHTML = '';
+                searchResultsWrapper.classList.add('disabled');
+            }
+            if (window.colorSearchManager && typeof window.colorSearchManager.showOtherSections === 'function') {
+                 window.colorSearchManager.showOtherSections();
+            } else {
+                const mainWrapper = document.querySelector('[data-colors-wrapper="main"]');
+                if (mainWrapper) {
+                    mainWrapper.classList.remove('disabled');
+                    mainWrapper.classList.add('active');
+                }
+            }
+        }
+        pendingSearchQuery = null;
+        return;
+    }
+
+    colorSystemState.searchTimeout = setTimeout(() => {
+        if (isColorSearchSystemLoaded && colorSearchModule) {
+            colorSearchModule.performSearch(query);
+        } else {
+            showSearchSpinner();
+            pendingSearchQuery = query;
+        }
+    }, COLOR_SYSTEM_CONFIG.debounceDelay);
+}
+
 
 function handleColorClick(element, colorData) {
     if (!isGradientColor(colorData.hex) && colorData.hex !== 'auto' && !isValidForTheme(colorData.hex)) {

@@ -5,7 +5,7 @@ import { addTimerAndRender, updateTimer } from '../features/timer-controller.js'
 import { showDynamicIslandNotification } from './notification-controller.js';
 import { playSound, stopSound, generateSoundList, handleAudioUpload, deleteUserAudio, getSoundNameById } from '../features/general-tools.js';
 import { getCurrentLocation } from '../services/location-manager.js';
-import { clearSearchColors } from './color-search-system.js';
+// import { clearSearchColors } from './color-search-system.js'; // LÍNEA CRÍTICA ELIMINADA
 
 let onConfirmCallback = null;
 let activeModalType = null;
@@ -521,8 +521,9 @@ function resetMenuForOverlay(menuName) {
             resetFeedbackMenu(menuElement);
             break;
         case 'menuPaletteColors':
-            if (typeof clearSearchColors === 'function') {
-                clearSearchColors();
+             // MODIFICADO: Llamada segura al módulo cargado dinámicamente
+            if (window.colorSearchManager && typeof window.colorSearchManager.clear === 'function') {
+                window.colorSearchManager.clear();
             }
             break;
         case 'menuSounds':

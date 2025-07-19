@@ -1,5 +1,4 @@
 import { resetLocationSearch, initLocationManager } from '../services/location-manager.js';
-import { initColorSearchSystem } from '../ui/color-search-system.js';
 import { initializeEverything } from '../features/everything-controller.js';
 import { initDB, initializeCardEventListeners, initializeCategorySliderService, initializeCentralizedFontManager, initializeFullScreenManager, initializeScrollShadow, startAudioCachePreload } from '../features/general-tools.js';
 import { applyCollapsedSectionsState, initColorTextSystem, refreshColorSystem, setupCollapsibleSectionEvents } from '../ui/palette-colors.js';
@@ -277,7 +276,7 @@ function initializeMainComponents() {
     initializeFullScreenManager();
     initializeCardEventListeners();
     initColorTextSystem();
-    initColorSearchSystem();
+    // initColorSearchSystem(); // ELIMINADO CORRECTAMENTE
     initializeAlarmClock();
     initWorldClock();
     initializeStopwatch();

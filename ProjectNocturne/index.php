@@ -15,8 +15,7 @@
     <link rel="stylesheet" type="text/css" href="assets/css/general/styles.css">
     <link rel="stylesheet" type="text/css" href="assets/css/general/dark-mode.css">
     <link rel="stylesheet" type="text/css" href="assets/css/tools/tools.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 
     <script src="assets/js/app/initial-theme.js"></script>
@@ -63,7 +62,6 @@
     <script type="module" src="assets/js/ui/drag-controller.js"></script>
     <script type="module" src="assets/js/ui/notification-controller.js"></script>
     <script type="module" src="assets/js/ui/menu-interactions.js"></script>
-    <script type="module" src="assets/js/ui/color-search-system.js"></script>
     <script type="module" src="assets/js/services/event-tracker.js"></script>
     <script type="module" src="assets/js/ui/palette-colors.js"></script>
 

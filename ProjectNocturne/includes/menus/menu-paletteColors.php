@@ -9,7 +9,8 @@
                     <span class="material-symbols-rounded">search</span>
                 </div>
                 <div class="search-content-text">
-                    <input type="text" class="body-title" autocomplete="off">
+                    
+                    <input type="text" class="body-title" autocomplete="off" data-translate="search_placeholder" data-translate-category="search" data-translate-target="placeholder">
                 </div>
             </div>
         </div>

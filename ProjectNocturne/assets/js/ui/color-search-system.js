@@ -217,81 +217,40 @@ function showOtherColorSections() {
     }
 }
 
-function initializeSearchInput() {
+function initColorSearchSystem() {
     if (searchState.isInitialized) return;
     if (typeof chroma === 'undefined') {
+        console.error("Chroma.js is not loaded. Color search system cannot initialize.");
         return;
     }
     const searchWrapper = document.querySelector(COLOR_SEARCH_CONFIG.searchColorsWrapper);
     if (searchWrapper) {
         searchWrapper.classList.add('disabled');
         searchWrapper.classList.remove('active');
-    } else {}
-    setupSearchInput();
-    searchState.isInitialized = true;
-}
-
-function setupSearchInput() {
-    const searchInput = document.querySelector(COLOR_SEARCH_CONFIG.searchInput);
-    if (!searchInput) {
-        return;
+    } else {
+        console.error("Search results wrapper not found.");
     }
-    updateSearchPlaceholder();
-    searchInput.addEventListener('input', handleSearchInput);
-    searchInput.addEventListener('focus', handleSearchFocus);
-    searchInput.addEventListener('blur', handleSearchBlur);
-    searchInput.addEventListener('keydown', handleSearchKeydown);
+    
+    // El input de búsqueda ahora es gestionado por palette-colors.js
+    // por lo que aquí no se adjuntan listeners.
+    
+    searchState.isInitialized = true;
+
+    // Se hace window.colorSearchManager disponible globalmente para ser accedido por palette-colors.js
+    window.colorSearchManager = {
+        init: initColorSearchSystem,
+        refresh: refreshSearchSystem,
+        clear: clearSearchColors,
+        performSearch: performSearch, // Exportando esta función
+        getState: getSearchState,
+        debug: debugSearchSystem,
+    };
 }
 
 function updateSearchPlaceholder() {
     const searchInput = document.querySelector(COLOR_SEARCH_CONFIG.searchInput);
     if (searchInput && !searchInput.hasAttribute('data-translate-target')) {
         searchInput.placeholder = getSearchPlaceholder();
-    }
-}
-
-function handleSearchInput(e) {
-    const query = e.target.value.trim();
-    if (searchState.searchTimeout) {
-        clearTimeout(searchState.searchTimeout);
-    }
-    if (!query) {
-        showOtherColorSections();
-        hideSearchSectionWrapper();
-        searchState.currentQuery = '';
-        searchState.currentResults = null;
-        return;
-    }
-    searchState.searchTimeout = setTimeout(() => {
-        performSearch(query);
-    }, COLOR_SEARCH_CONFIG.debounceDelay);
-}
-
-function handleSearchFocus(e) {
-    const query = e.target.value.trim();
-    if (query && !searchState.currentResults) {
-        performSearch(query);
-    }
-}
-
-function handleSearchBlur(e) {
-    setTimeout(() => {
-        const searchInput = document.querySelector(COLOR_SEARCH_CONFIG.searchInput);
-        if (!searchInput || !searchInput.value.trim()) {}
-    }, 150);
-}
-
-function handleSearchKeydown(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        const query = e.target.value.trim();
-        if (query) {
-            performSearch(query);
-        } else {
-            clearSearchColors();
-        }
-    } else if (e.key === 'Escape') {
-        e.target.blur();
     }
 }
 
@@ -824,7 +783,6 @@ function isLightColor(hex) {
 function refreshSearchSystem() {
     if (searchState.isInitialized) {
         updateSearchPlaceholder();
-        setupSearchInput();
         const searchInput = document.querySelector(COLOR_SEARCH_CONFIG.searchInput);
         if (searchInput && searchInput.value.trim()) {
             performSearch(searchInput.value.trim());
@@ -832,18 +790,6 @@ function refreshSearchSystem() {
             showOtherColorSections();
             hideSearchSectionWrapper();
         }
-    }
-}
-
-function addCustomColor(name, hex, lang = 'en-us') {
-    if (COLOR_DATABASES[lang]) {
-        COLOR_DATABASES[lang][name.toLowerCase()] = hex;
-    }
-}
-
-function removeCustomColor(name, lang = 'en-us') {
-    if (COLOR_DATABASES[lang]) {
-        delete COLOR_DATABASES[lang][name.toLowerCase()];
     }
 }
 
@@ -861,88 +807,16 @@ function getSearchState() {
 
 function debugSearchSystem() {}
 
-function integrateWithColorSystem() {
-    document.addEventListener('moduleActivated', (e) => {
-        if (e.detail && e.detail.module === 'togglePaletteColors') {
-            setTimeout(() => {
-                if (window.colorTextManager && !window.colorTextManager.getColorInfo().isInitialized) {
-                    window.colorTextManager.initColorTextSystem();
-                }
-                if (!searchState.isInitialized) {
-                    initializeSearchInput();
-                } else {
-                    refreshSearchSystem();
-                }
-            }, 100);
-        }
-    });
-    document.addEventListener('moduleDeactivated', (e) => {
-        if (e.detail && e.detail.module === 'togglePaletteColors') {
-            clearSearchColors();
-        }
-    });
-    document.addEventListener('themeChanged', (e) => {
-        if (searchState.currentQuery && searchState.currentResults) {
-            setTimeout(() => {
-                performSearch(searchState.currentQuery);
-            }, 300);
-        }
-    });
-    document.addEventListener('languageChanged', (e) => {
-        setTimeout(() => {
-            updateSearchPlaceholder();
-            if (searchState.currentQuery && searchState.currentResults) {
-                performSearch(searchState.currentQuery);
-            }
-        }, 500);
-    });
-    document.addEventListener('translationsApplied', (e) => {
-        setTimeout(() => {
-            updateSearchPlaceholder();
-        }, 100);
-    });
-}
-
-function initColorSearchSystem() {
-    integrateWithColorSystem();
-    window.colorSearchDebug = debugSearchSystem;
-    window.clearColorSearch = clearSearchColors;
-    window.showColorSections = showOtherColorSections;
-    window.hideColorSections = hideOtherColorSections;
-    window.showSearchSectionWrapper = showSearchSectionWrapper;
-    window.hideSearchSectionWrapper = hideSearchSectionWrapper;
-}
-
-window.colorSearchManager = {
-    init: initializeSearchInput,
-    refresh: refreshSearchSystem,
-    clear: clearSearchColors,
-    addColor: addCustomColor,
-    removeColor: removeCustomColor,
-    getState: getSearchState,
-    debug: debugSearchSystem,
-    hideOtherSections: hideOtherColorSections,
-    showOtherSections: showOtherColorSections,
-    performSearch: performSearch,
-    isValidForTheme: isValidForTheme,
-    getCurrentTheme: getCurrentTheme,
-    updatePlaceholder: updateSearchPlaceholder,
-    showSearchSectionWrapper: showSearchSectionWrapper,
-    hideSearchSectionWrapper: hideSearchSectionWrapper
-};
 
 export {
     initColorSearchSystem,
-    initializeSearchInput,
+    performSearch, // MODIFICADO: Exportar función
+    clearSearchColors, // MODIFICADO: Exportar función
     refreshSearchSystem,
-    clearSearchColors,
-    addCustomColor,
-    removeCustomColor,
     getSearchState,
     debugSearchSystem,
     hideOtherColorSections,
     showOtherColorSections,
-    performSearch,
     isValidForTheme,
     getCurrentTheme,
     updateSearchPlaceholder,
