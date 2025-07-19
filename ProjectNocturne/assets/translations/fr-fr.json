@@ -62,7 +62,9 @@
     "feedback_error_server": "Erreur du serveur, veuillez réessayer plus tard.",
     "feedback_error_sending": "Erreur lors de l'envoi du commentaire, veuillez réessayer plus tard.",
     "section_deleted": "La section '{name}' a été supprimée.",
-    "duplicate_section_name": "Une section portant le nom '{name}' existe déjà."
+    "duplicate_section_name": "Une section portant le nom '{name}' existe déjà.",
+    "audio_deleted_title": "Audio supprimé",
+    "audio_deleted": "L'audio '{name}' a été supprimé."
   },
   "color_system": {
     "color_unavailable": "Non disponible",

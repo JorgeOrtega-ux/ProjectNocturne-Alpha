@@ -62,7 +62,9 @@
     "feedback_error_sending": "Error sending feedback, please try again later.",
     "section_deleted": "Section '{name}' has been deleted.",
     "section_updated_success": "Section '{name}' has been updated successfully.",
-    "duplicate_section_name": "A section with the name '{name}' already exists."
+    "duplicate_section_name": "A section with the name '{name}' already exists.",
+    "audio_deleted_title": "Audio Deleted",
+    "audio_deleted": "The audio '{name}' has been deleted."
   },
   "color_system": {
     "color_unavailable": "Not available",

@@ -62,7 +62,9 @@
     "feedback_error_invalid_email": "Por favor, introduce una dirección de correo electrónico válida.",
     "feedback_error_server": "Error del servidor, por favor intenta más tarde.",
     "feedback_error_sending": "Error al enviar el comentario, por favor intenta más tarde.",
-    "duplicate_section_name": "Ya existe una sección con el nombre '{name}'."
+    "duplicate_section_name": "Ya existe una sección con el nombre '{name}'.",
+    "audio_deleted_title": "Audio eliminado",
+    "audio_deleted": "El audio '{name}' se ha eliminado correctamente."
   },
   "color_system": {
     "color_unavailable": "No disponible",

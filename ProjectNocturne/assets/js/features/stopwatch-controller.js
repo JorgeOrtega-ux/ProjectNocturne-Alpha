@@ -259,15 +259,28 @@ function exportLaps() {
     const executeExport = () => {
         try {
             const wb = XLSX.utils.book_new();
+            
+            // --- LÍNEAS MODIFICADAS ---
+            const sheetName = getTranslation("lap_header", "stopwatch"); // Usa la traducción de "Vuelta" o "Lap"
+            const fileName = `${getTranslation("stopwatch", "tooltips")}_${getTranslation("lap_header", "stopwatch").toLowerCase()}.xlsx`; // Crea un nombre de archivo dinámico, ej: "Cronometro_vueltas.xlsx"
+            // --- FIN DE LÍNEAS MODIFICADAS ---
+
             const ws_data = [
                 [getTranslation("lap_header", "stopwatch"), getTranslation("time_header", "stopwatch"), getTranslation("total_time_header", "stopwatch")],
                 ...stopwatchState.laps.map(lap => [lap.lap, formatTime(lap.time, true), formatTime(lap.totalTime, true)])
             ];
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, "Laps");
-            XLSX.writeFile(wb, "stopwatch_laps.xlsx");
+
+            // --- LÍNEAS MODIFICADAS ---
+            XLSX.utils.book_append_sheet(wb, ws, sheetName); // Usa el nombre de hoja traducido
+            XLSX.writeFile(wb, fileName); // Usa el nombre de archivo traducido
+            // --- FIN DE LÍNEAS MODIFICADAS ---
+
         } catch (error) {
-            showDynamicIslandNotification('error', 'Error al exportar.', 'notifications');
+            // --- LÍNEA MODIFICADA (BONUS) ---
+            // También he corregido un mensaje de error que no estaba traducido
+            showDynamicIslandNotification('error', getTranslation('export_error', 'notifications'));
+            // --- FIN DE LÍNEA MODIFICADA ---
         } finally {
             setTimeout(() => {
                 iconContainer.innerHTML = originalIconHTML;
@@ -284,7 +297,9 @@ function exportLaps() {
             setTimeout(executeExport, 500);
         };
         script.onerror = () => {
-            showDynamicIslandNotification('error', 'Error al cargar la librería de exportación.', 'notifications');
+            // --- LÍNEA MODIFICADA (BONUS) ---
+            showDynamicIslandNotification('error', getTranslation('export_library_error', 'notifications'));
+            // --- FIN DE LÍNEA MODIFICADA ---
             iconContainer.innerHTML = originalIconHTML;
             exportLapsBtn.classList.remove('disabled-interactive');
             updateButtonStates();

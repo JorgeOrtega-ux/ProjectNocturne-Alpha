@@ -35,25 +35,6 @@ body {
     color: #000000;
 }
 
-.tool-alarm span,
-.tool-timer span,
-.tool-stopwatch span,
-.tool-worldClock span {
-    text-align: center;
-    background-image: none;
-    background-clip: unset;
-    color: unset;
-    -webkit-background-clip: unset;
-    -webkit-text-fill-color: unset;
-    white-space: nowrap;
-    /* --- LÍNEAS AÑADIDAS/MODIFICADAS --- */
-    display: inline-flex;
-    /* Activa el modo Flexbox */
-    align-items: baseline;
-    /* ¡La clave! Alinea el texto en su base */
-    line-height: 1;
-    /* Normaliza la altura de la línea */
-}
 
 /* ====================================== */
 /* ========== PAGE WRAPPER ============= */
@@ -400,17 +381,6 @@ body {
     user-select: none;
 }
 
-.module-overlay-right {
-    right: 0;
-    position: absolute;
-    z-index: 998;
-    width: auto;
-    height: auto;
-    padding: 8px;
-    user-select: none;
-
-}
-
 .menu-header-fixed {
     display: flex;
     flex-direction: column;
@@ -496,13 +466,6 @@ body {
     height: auto;
     padding: 8px;
     border-top: 1px solid #00000020;
-}
-
-.creation-content {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
 }
 
 /* ====================================== */
@@ -615,7 +578,6 @@ body {
     position: relative;
     width: 100%;
     border-radius: 50%;
-    border: 1px solid #00000020;
     aspect-ratio: 1;
     cursor: pointer;
 }
@@ -976,17 +938,6 @@ body {
     right: 3px;
 }
 
-.tool-alarm,
-.tool-timer,
-.tool-stopwatch,
-.tool-worldClock {
-    display: flex;
-    flex: 1 1 auto;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    overflow: hidden;
-}
 
 /* ====================================== */
 /* ============ DRAG HANDLE ============= */

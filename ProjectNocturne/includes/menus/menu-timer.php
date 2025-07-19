@@ -133,7 +133,13 @@
                                         </div>
                                         <div class="custom-select-content-right"><span class="material-symbols-rounded">arrow_right</span></div>
                                     </div>
-                                    <div class="menu-action-button" data-action="previewCountdownSound"><span class="material-symbols-rounded">play_arrow</span></div>
+                                    <div class="menu-action-button"
+                                        data-action="previewCountToDateSound"
+                                        data-translate="test_alarm"
+                                        data-translate-category="alarms"
+                                        data-translate-target="tooltip">
+                                        <span class="material-symbols-rounded">play_arrow</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -215,7 +221,13 @@
                                         </div>
                                         <div class="custom-select-content-right"><span class="material-symbols-rounded">arrow_right</span></div>
                                     </div>
-                                    <div class="menu-action-button" data-action="previewCountToDateSound"><span class="material-symbols-rounded">play_arrow</span></div>
+                                    <div class="menu-action-button"
+                                        data-action="previewCountToDateSound"
+                                        data-translate="test_alarm"
+                                        data-translate-category="alarms"
+                                        data-translate-target="tooltip">
+                                        <span class="material-symbols-rounded">play_arrow</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

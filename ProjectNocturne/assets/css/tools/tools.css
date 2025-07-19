@@ -8,6 +8,32 @@
     gap: 8px;
     width: 100%;
 }
+.tool-alarm span,
+.tool-timer span,
+.tool-stopwatch span,
+.tool-worldClock span {
+    text-align: center;
+    background-image: none;
+    background-clip: unset;
+    color: unset;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: baseline;
+    line-height: 1;
+}
+.tool-alarm,
+.tool-timer,
+.tool-stopwatch,
+.tool-worldClock {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow: hidden;
+}
 
 .menu-button {
     display: flex;
@@ -35,24 +61,28 @@
     background-color: #f5f5fa;
 }
 
-/* Primary Button (e.g., Create, Send) */
 .menu-button.menu-button--primary {
     background-color: #000000;
     color: #ffffff;
     border-color: #000000;
 }
 
-/* Danger Button (e.g., Delete) */
 .menu-button.menu-button--danger {
     background-color: #d32f2f;
     color: #ffffff;
     border-color: #d32f2f;
 }
 
+.menu-content-header-primary {
+    min-width: 0;
+}
 
-/* ====================================== */
-/* ORIGINAL STYLES (UNCHANGED)            */
-/* ====================================== */
+.menu-content-header-primary span:last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
 
 .enter-text-tool {
     display: flex;

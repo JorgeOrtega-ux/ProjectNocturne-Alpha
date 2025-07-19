@@ -96,7 +96,11 @@
                                             <span class="material-symbols-rounded">arrow_right</span>
                                         </div>
                                     </div>
-                                    <div class="menu-action-button" data-action="previewAlarmSound">
+                                    <div class="menu-action-button"
+                                        data-action="previewAlarmSound"
+                                        data-translate="test_alarm"
+                                        data-translate-category="alarms"
+                                        data-translate-target="tooltip">
                                         <span class="material-symbols-rounded">play_arrow</span>
                                     </div>
                                 </div>
