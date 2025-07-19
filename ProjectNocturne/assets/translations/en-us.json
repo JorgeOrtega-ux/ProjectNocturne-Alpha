@@ -22,6 +22,7 @@
     "rang_ago_header": "Time Elapsed"
   },
   "notifications": {
+    "action_not_allowed_while_ringing": "This action cannot be performed while an alarm or timer is ringing.",
     "alarm_ringing_title": "Alarm Ringing",
     "alarm_created_title": "Alarm Created",
     "alarm_updated_title": "Alarm Updated",

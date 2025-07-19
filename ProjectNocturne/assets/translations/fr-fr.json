@@ -22,6 +22,7 @@
     "rang_ago_header": "Temps Écoulé"
   },
   "notifications": {
+    "action_not_allowed_while_ringing": "Cette action ne peut pas être effectuée lorsqu'une alarme ou une minuterie sonne.",
     "alarm_ringing_title": "Alarme sonne",
     "alarm_created_title": "Alarme créée",
     "alarm_updated_title": "Alarme mise à jour",

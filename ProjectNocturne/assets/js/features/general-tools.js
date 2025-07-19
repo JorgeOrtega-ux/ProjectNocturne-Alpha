@@ -1479,6 +1479,7 @@ function handleAlarmCardAction(action, alarmId, target) {
     // Permitir solo la acción de descartar si esta alarma específica está sonando
     if (isRinging) {
         if (!alarm || !alarm.isRinging || action !== 'dismiss-alarm') {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
             return;
         }
     }
@@ -1515,6 +1516,7 @@ function handleTimerCardAction(action, timerId, target) {
     // Permitir solo la acción de descartar si este temporizador específico está sonando
     if (isRinging) {
         if (!timer || !timer.isRinging || action !== 'dismiss-timer') {
+            showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
             return;
         }
     }

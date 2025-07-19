@@ -22,6 +22,7 @@
     "rang_ago_header": "Tiempo Transcurrido"
   },
   "notifications": {
+    "action_not_allowed_while_ringing": "Esta acción no se puede realizar mientras una alarma o temporizador está sonando.",
     "alarm_ringing_title": "Alarma sonando",
     "alarm_created_title": "Alarma creada",
     "alarm_updated_title": "Alarma actualizada",

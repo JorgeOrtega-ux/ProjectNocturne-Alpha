@@ -1156,6 +1156,35 @@ function initializeAlarmClock() {
         wrapper.appendChild(userContainer);
         wrapper.appendChild(defaultContainer);
     }
+
+    const alarmSection = document.querySelector('.section-alarm');
+    if (alarmSection) {
+        const addAlarmBtn = alarmSection.querySelector('[data-module="toggleMenuAlarm"]');
+        if (addAlarmBtn) {
+            addAlarmBtn.addEventListener('click', (e) => {
+                if (isAnyAlarmRinging()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                }
+            }, true); // Usar fase de captura
+        }
+    }
+
+    const menuElement = document.querySelector('.menu-alarm[data-menu="alarm"]');
+    if (menuElement) {
+        const createButton = menuElement.querySelector('[data-action="createAlarm"]');
+        if (createButton) {
+            createButton.addEventListener('click', () => {
+                if (isAnyAlarmRinging()) {
+                    showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                    return;
+                }
+            });
+        }
+    }
+
+
     loadAlarmSectionsFromStorage();
     loadAndRestoreAlarms();
     loadDefaultAlarms();
@@ -1163,7 +1192,7 @@ function initializeAlarmClock() {
     updateAlarmCounts();
     applySavedSectionOrder();
     initializeAlarmSortable();
-    
+
 
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
@@ -1197,7 +1226,8 @@ function initializeAlarmClock() {
             saveAlarmsToStorage();
             saveDefaultAlarmsOrder();
         },
-        renderAllAlarmCards
+        renderAllAlarmCards,
+        isAnyAlarmRinging
     };
 
     updateEverythingWidgets();

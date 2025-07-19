@@ -1514,12 +1514,29 @@ function initializeTimerController() {
     const section = document.querySelector('.section-timer');
     if (!section) return;
 
+    // --- INICIO DE LA MODIFICACIÓN ---
+    const addTimerBtn = section.querySelector('[data-module="toggleMenuTimer"]');
+    if (addTimerBtn) {
+        addTimerBtn.addEventListener('click', (e) => {
+            if (isAnyTimerRinging()) {
+                e.preventDefault();
+                e.stopPropagation();
+                showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+            }
+        }, true); // Usar fase de captura
+    }
+    // --- FIN DE LA MODIFICACIÓN ---
+
     const startBtn = section.querySelector('[data-action="start-pinned-timer"]');
     const pauseBtn = section.querySelector('[data-action="pause-pinned-timer"]');
     const resetBtn = section.querySelector('[data-action="reset-pinned-timer"]');
 
     if (startBtn) {
         startBtn.addEventListener('click', () => {
+            if (isAnyTimerRinging()) {
+                showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                return;
+            }
             if (pinnedTimerId) {
                 startTimer(pinnedTimerId);
             }
@@ -1528,6 +1545,10 @@ function initializeTimerController() {
 
     if (pauseBtn) {
         pauseBtn.addEventListener('click', () => {
+             if (isAnyTimerRinging()) {
+                showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                return;
+            }
             if (pinnedTimerId) {
                 pauseTimer(pinnedTimerId);
             }
@@ -1536,6 +1557,10 @@ function initializeTimerController() {
 
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
+             if (isAnyTimerRinging()) {
+                showDynamicIslandNotification('error', 'action_not_allowed_while_ringing', 'notifications');
+                return;
+            }
             if (pinnedTimerId) {
                 resetTimer(pinnedTimerId);
             }
